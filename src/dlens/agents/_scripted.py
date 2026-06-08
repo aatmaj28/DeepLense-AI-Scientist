@@ -22,10 +22,16 @@ from pydantic_ai.models.function import AgentInfo, FunctionModel
 
 
 def _output_tool(info: AgentInfo, fragment: str) -> str:
-    """Find the auto-generated output tool whose name contains ``fragment``."""
+    """Find the auto-generated output tool whose name contains ``fragment``.
+
+    Union output types are named ``final_result_<TypeName>``; a single output type
+    is just ``final_result`` — fall back to it when there is only one.
+    """
     for tool in info.output_tools:
         if fragment in tool.name:
             return tool.name
+    if len(info.output_tools) == 1:
+        return info.output_tools[0].name
     raise LookupError(
         f"No output tool matching {fragment!r}: {[t.name for t in info.output_tools]}"
     )
@@ -79,5 +85,46 @@ def make_scripted_sim_model(
                 ]
             )
         return ModelResponse(parts=[ToolCallPart("run_simulation", {"config": plan})])
+
+    return FunctionModel(respond)
+
+
+def make_scripted_model_design_model(characteristics: dict[str, Any]) -> FunctionModel:
+    """Scripted model for the Model Design Agent: call ``recommend_architecture``
+    with ``characteristics``, then echo the recommendation as a ModelDesignReport.
+    """
+
+    def respond(messages: list[ModelMessage], info: AgentInfo) -> ModelResponse:
+        rec = None
+        for m in messages:
+            for p in m.parts:
+                if (
+                    getattr(p, "part_kind", "") == "tool-return"
+                    and getattr(p, "tool_name", "") == "recommend_architecture"
+                ):
+                    rec = p.content
+
+        if rec is None:
+            return ModelResponse(
+                parts=[ToolCallPart("recommend_architecture", {"characteristics": characteristics})]
+            )
+
+        if isinstance(rec, str):
+            import json
+
+            rec = json.loads(rec)
+        return ModelResponse(
+            parts=[
+                ToolCallPart(
+                    _output_tool(info, "ModelDesignReport"),
+                    {
+                        "reasoning": "Adopting the vetted baseline from recommend_architecture.",
+                        "message": f"Recommended {rec['architecture']['name']}.",
+                        "architecture": rec["architecture"],
+                        "training_config": rec["training_config"],
+                    },
+                )
+            ]
+        )
 
     return FunctionModel(respond)

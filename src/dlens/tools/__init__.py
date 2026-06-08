@@ -20,6 +20,7 @@ from dlens.tools._sim_backends import (
 )
 from dlens.tools._sim_runner import execute_simulation
 from dlens.tools._simulation import SimDeps, register_simulation_tool
+from dlens.tools._model_design import recommend_baseline, register_model_design_tool
 
 __all__ = [
     "RestClient",
@@ -38,4 +39,6 @@ __all__ = [
     "execute_simulation",
     "SimDeps",
     "register_simulation_tool",
+    "recommend_baseline",
+    "register_model_design_tool",
 ]

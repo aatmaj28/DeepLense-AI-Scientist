@@ -16,7 +16,8 @@ from ._data_simulation import (
     extract_plan,
     format_plan,
 )
-from ._scripted import make_scripted_sim_model
+from ._model_design import ModelDesignAgent, ModelDesignReport
+from ._scripted import make_scripted_model_design_model, make_scripted_sim_model
 
 __all__ = [
     "OllamaModel",
@@ -32,5 +33,8 @@ __all__ = [
     "SimReport",
     "extract_plan",
     "format_plan",
+    "ModelDesignAgent",
+    "ModelDesignReport",
     "make_scripted_sim_model",
+    "make_scripted_model_design_model",
 ]

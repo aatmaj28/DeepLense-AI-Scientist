@@ -13,11 +13,27 @@ from dlens.schemas._simulation import (
     SimOutput,
     SubstructureType,
 )
+from dlens.schemas._model_design import (
+    ArchFamily,
+    ArchitectureSpec,
+    DatasetCharacteristics,
+    TaskType,
+    TrainingConfig,
+    characteristics_from_sim_outputs,
+)
 
 __all__ = [
+    # simulation
     "SubstructureType",
     "SimModelConfig",
     "CosmologyParams",
     "SimConfig",
     "SimOutput",
+    # model design
+    "TaskType",
+    "ArchFamily",
+    "DatasetCharacteristics",
+    "ArchitectureSpec",
+    "TrainingConfig",
+    "characteristics_from_sim_outputs",
 ]
