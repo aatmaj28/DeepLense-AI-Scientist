@@ -19,7 +19,7 @@ from __future__ import annotations
 import json
 import inspect
 import asyncio
-from typing import Any, Callable, Optional, Dict
+from typing import Any, Callable, Optional
 from mcp.server.fastmcp import FastMCP
 from loguru import logger
 

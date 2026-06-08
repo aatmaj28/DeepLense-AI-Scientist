@@ -5,7 +5,6 @@
 from __future__ import annotations
 from dlens.tools._rest_client import make_api_request, get_api_key
 from typing import Optional, Dict, Any
-from loguru import logger
 from dotenv import load_dotenv
 
 load_dotenv()
