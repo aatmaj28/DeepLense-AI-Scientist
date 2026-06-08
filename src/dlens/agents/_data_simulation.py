@@ -24,16 +24,11 @@ from pydantic_ai import DeferredToolRequests, DeferredToolResults, ToolDenied
 from pydantic_ai.messages import ModelMessage
 
 from dlens.agents._base import BaseAgentConfig, DLensConversationalAgent, OutputSchema
-from dlens.agents._models import OllamaModel
+from dlens.config import build_model_from_env
 from dlens.prompts import SIM_SYSTEM_PROMPT
 from dlens.schemas import SimConfig, SimOutput
 from dlens.tools._sim_backends import SimBackend, get_backend
 from dlens.tools._simulation import SimDeps, register_simulation_tool
-
-# Default local model. Pranath's preferred local models are Qwen / gpt-oss via
-# Ollama; qwen3:8b runs on a single workstation GPU. See README / config for
-# how to change this and for the gpt-oss alternative.
-DEFAULT_SIM_MODEL = "qwen3:8b"
 
 
 class SimClarification(OutputSchema):
@@ -78,7 +73,8 @@ class DataSimulationAgent(DLensConversationalAgent):
                     "runs, with clarification and plan-approval human-in-the-loop gates."
                 ),
                 custom_system_prompt=SIM_SYSTEM_PROMPT,
-                model=model or OllamaModel(model_name=DEFAULT_SIM_MODEL),
+                # Local-first, env-configurable (defaults to Ollama qwen3:8b).
+                model=model or build_model_from_env(),
                 debug=debug,
             )
         elif model is not None:

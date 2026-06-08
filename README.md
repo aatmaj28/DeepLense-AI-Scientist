@@ -93,3 +93,53 @@ Or run the test suite:
 ```bash
 uv run pytest
 ```
+
+## 6. Local models (Ollama / vLLM)
+
+DLens is local-first. The default model is **`qwen3:8b`** (~5.2 GB) via
+[Ollama](./Tutorials/ollama-installation-guide.md) — it runs on a single
+workstation GPU and supports tool calling.
+
+```bash
+ollama pull qwen3:8b      # default
+ollama pull gpt-oss:20b   # recommended alternative for larger GPUs (~14 GB)
+```
+
+The model is selected entirely via environment variables (see `.env.example`) and
+reuses the wrappers in `dlens.agents._models`. Copy the template and edit:
+
+```bash
+cp .env.example .env
+```
+
+| Variable | Default | Notes |
+|----------|---------|-------|
+| `DLENS_MODEL_PROVIDER` | `ollama` | `ollama` \| `vllm` \| `llamacpp` \| `openai` \| `openai_compatible` |
+| `DLENS_MODEL` | `qwen3:8b` | smaller: `qwen3:4b`; bigger: `qwen3:14b`/`qwen3:32b`; stronger: `gpt-oss:20b` |
+| `DLENS_MODEL_PORT` | per provider | ollama 11434, vLLM 8000, llama.cpp 8080 |
+| `DLENS_MODEL_BASE_URL` | — | for `openai_compatible` (shared vLLM gateway / OpenRouter) |
+| `DLENS_MODEL_API_KEY` | — | shared key for `openai_compatible` (or `OPENAI_API_KEY`) |
+
+A **shared-key / remote** path is switchable for later (e.g. a shared vLLM gateway
+or OpenRouter) via `DLENS_MODEL_PROVIDER=openai_compatible` — **no keys in code**.
+
+## 7. Try the Data Simulation Agent
+
+The first pipeline agent (see [docs/WORKFLOW_DESIGN.md](./docs/WORKFLOW_DESIGN.md))
+turns a natural-language request into a validated DeepLenseSim run, with
+clarification and plan-approval human-in-the-loop gates. It runs fully offline (a
+scripted model + a mock simulation backend — **no GPU, no LLM**):
+
+```bash
+uv run python scripts/data_simulation_demo.py          # offline (scripted)
+uv run python scripts/data_simulation_demo.py --live   # uses the configured local model
+```
+
+The real DeepLenseSim backend is optional (heavy, version-pinned) — install the
+`deeplense` extra to enable it; otherwise the mock backend is used automatically:
+
+```bash
+uv pip install "lenstronomy==1.9.2" colossus
+git clone https://github.com/dangilman/pyHalo.git && (cd pyHalo && pip install -e .)
+git clone https://github.com/mwt5345/DeepLenseSim.git && (cd DeepLenseSim && pip install -e .)
+```

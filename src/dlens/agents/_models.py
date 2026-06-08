@@ -15,8 +15,10 @@ class OpenAIModel(OpenAIModel):
 
 
 # Wrapper for Ollama model
+# Default is qwen3:8b (~5.2 GB) — local-first and single-GPU friendly. For stronger
+# reasoning on a larger GPU, gpt-oss:20b (~14 GB) is the recommended alternative.
 class OllamaModel(OpenAIChatModel):
-    def __init__(self, model_name: str = "gpt-oss:20b", port: str = "11434"):
+    def __init__(self, model_name: str = "qwen3:8b", port: str = "11434"):
         super().__init__(
             model_name=model_name,
             provider=OllamaProvider(base_url=f"http://localhost:{port}/v1"),
