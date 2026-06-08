@@ -11,6 +11,15 @@ from dlens.tools._base import (
     AbstractBaseTool,
 )
 from dlens.tools._mcp_wrapper import mcp_rest_tool
+from dlens.tools._sim_backends import (
+    DeepLensBackend,
+    MockBackend,
+    SimBackend,
+    deeplense_available,
+    get_backend,
+)
+from dlens.tools._sim_runner import execute_simulation
+from dlens.tools._simulation import SimDeps, register_simulation_tool
 
 __all__ = [
     "RestClient",
@@ -21,4 +30,12 @@ __all__ = [
     "AbstractToolOutputSchema",
     "AbstractBaseTool",
     "mcp_rest_tool",
+    "SimBackend",
+    "MockBackend",
+    "DeepLensBackend",
+    "deeplense_available",
+    "get_backend",
+    "execute_simulation",
+    "SimDeps",
+    "register_simulation_tool",
 ]

@@ -216,3 +216,8 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# DLens simulation outputs (generated at runtime; .npy/.png can be large)
+simulations/
+outputs/
+*.npy
