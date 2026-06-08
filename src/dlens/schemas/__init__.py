@@ -21,6 +21,12 @@ from dlens.schemas._model_design import (
     TrainingConfig,
     characteristics_from_sim_outputs,
 )
+from dlens.schemas._experiment import (
+    ExperimentRun,
+    ExperimentState,
+    PlannerAction,
+    PlannerDecision,
+)
 
 __all__ = [
     # simulation
@@ -36,4 +42,9 @@ __all__ = [
     "ArchitectureSpec",
     "TrainingConfig",
     "characteristics_from_sim_outputs",
+    # experiment state / planner (WIP)
+    "PlannerAction",
+    "PlannerDecision",
+    "ExperimentRun",
+    "ExperimentState",
 ]

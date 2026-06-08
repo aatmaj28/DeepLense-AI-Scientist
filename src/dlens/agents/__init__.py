@@ -17,6 +17,7 @@ from ._data_simulation import (
     format_plan,
 )
 from ._model_design import ModelDesignAgent, ModelDesignReport
+from ._experiment_planner import ExperimentPlanner
 from ._scripted import make_scripted_model_design_model, make_scripted_sim_model
 
 __all__ = [
@@ -35,6 +36,7 @@ __all__ = [
     "format_plan",
     "ModelDesignAgent",
     "ModelDesignReport",
+    "ExperimentPlanner",
     "make_scripted_sim_model",
     "make_scripted_model_design_model",
 ]
