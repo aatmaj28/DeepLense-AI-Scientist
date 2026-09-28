@@ -48,7 +48,7 @@ from dlens.agents._architecture_search import (
 )
 from dlens.agents._experiment_loop import ExperimentLoop, best_run_by_val_accuracy
 from dlens.agents._experiment_planner import ExperimentPlanner, ReActPlannerStrategy
-from dlens.config import DEFAULT_LLM, build_llm
+from dlens.config import build_llm
 from dlens.schemas._downstream import DatasetRef
 from dlens.schemas._model_design import ArchFamily, ArchitectureSpec, TrainingConfig
 from dlens.tools._analysis import compute_analysis
@@ -200,10 +200,11 @@ def collect_checkpoints(run_dir: str, backend_root: str) -> list[dict]:
 def llm_banner(llm) -> str:
     """The effective LLM as built; echoed at the start of every run's own log."""
     return (f"effective LLM   : {type(llm).__name__} model_name="
-            f"{getattr(llm, 'model_name', '?')}  (DLENS_LLM={os.getenv('DLENS_LLM')})")
+            f"{getattr(llm, 'model_name', '?')} base_url={getattr(llm, 'base_url', '?')}  "
+            f"(DLENS_LLM={os.getenv('DLENS_LLM')})")
 
 
-def environment_info(llm_id: str) -> dict:
+def environment_info(llm) -> dict:
     import torch
     try:
         commit = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True,
@@ -212,7 +213,9 @@ def environment_info(llm_id: str) -> dict:
         commit = "unknown"
     return {
         "git_commit": commit,
-        "llm": llm_id,
+        # The model actually built, and where it was served from.
+        "llm": getattr(llm, "model_name", None),
+        "llm_base_url": str(getattr(llm, "base_url", None)),
         "python": platform.python_version(),
         "torch": torch.__version__,
         "device": "mps" if torch.backends.mps.is_available() else "cpu",
@@ -314,7 +317,7 @@ async def tune_and_test(*, run_id: str, run_dir: str, arch: ArchitectureSpec,
 # Experiment A
 # --------------------------------------------------------------------------- #
 
-async def experiment_a(args, classes, train_ref, val_ref, llm, llm_id, art_root) -> list[dict]:
+async def experiment_a(args, classes, train_ref, val_ref, llm, art_root) -> list[dict]:
     print(f"\n{RULE}\n  EXPERIMENT A — fixed architectures x {len(args.seeds)} seeds\n{RULE}",
           flush=True)
     rows = []
@@ -335,7 +338,7 @@ async def experiment_a(args, classes, train_ref, val_ref, llm, llm_id, art_root)
                                  "train_dir": args.train_dir, "val_dir": args.val_dir,
                                  "n_train": train_ref.num_samples,
                                  "n_val": val_ref.num_samples},
-                    "environment": environment_info(llm_id),
+                    "environment": environment_info(llm),
                 })
                 res = await tune_and_test(
                     run_id=run_id, run_dir=run_dir, arch=arch, train_ref=train_ref,
@@ -353,7 +356,7 @@ async def experiment_a(args, classes, train_ref, val_ref, llm, llm_id, art_root)
 # Experiment B
 # --------------------------------------------------------------------------- #
 
-async def experiment_b(args, classes, train_ref, val_ref, llm, llm_id, art_root) -> list[dict]:
+async def experiment_b(args, classes, train_ref, val_ref, llm, art_root) -> list[dict]:
     print(f"\n{RULE}\n  EXPERIMENT B — full pipeline x {args.pipeline_runs} runs\n{RULE}",
           flush=True)
     task = (
@@ -383,7 +386,7 @@ async def experiment_b(args, classes, train_ref, val_ref, llm, llm_id, art_root)
                              "tune_iterations": args.tune_iterations,
                              "n_train": train_ref.num_samples,
                              "n_val": val_ref.num_samples},
-                "environment": environment_info(llm_id),
+                "environment": environment_info(llm),
             })
             search = ArchitectureSearch(
                 generator=ArchitectureGenerator(model=llm),
@@ -507,8 +510,6 @@ async def main() -> int:
     val_ref = dataset_ref(os.path.join(args.data_root, args.val_dir), classes)
 
     llm = build_llm()  # DLENS_LLM
-    # Record the model actually built, not just the env var that selected it.
-    llm_id = getattr(llm, "model_name", None) or os.getenv("DLENS_LLM") or DEFAULT_LLM
     import torch
 
     art_root = os.path.expanduser(args.artifact_root)
@@ -535,14 +536,14 @@ async def main() -> int:
 
     t_start = time.monotonic()
     rows_a = [] if args.skip_a else await experiment_a(
-        args, classes, train_ref, val_ref, llm, llm_id, art_root)
+        args, classes, train_ref, val_ref, llm, art_root)
     rows_b = [] if args.skip_b else await experiment_b(
-        args, classes, train_ref, val_ref, llm, llm_id, art_root)
+        args, classes, train_ref, val_ref, llm, art_root)
     total_s = time.monotonic() - t_start
 
     manifest = {
         "generated": time.strftime("%Y-%m-%dT%H:%M:%S"),
-        "environment": environment_info(llm_id),
+        "environment": environment_info(llm),
         "protocol": vars(args) | {"seeds": args.seeds},
         "dataset": {"n_train": train_ref.num_samples, "n_val": val_ref.num_samples,
                     "train_dir": args.train_dir, "test_root": args.test_root},

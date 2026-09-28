@@ -9,6 +9,7 @@ from pydantic_ai.models.openai import OpenAIChatModel
 from dlens.config import (
     DEFAULT_MODEL,
     DEFAULT_PROVIDER,
+    GROQ_BASE_URL,
     ModelSettings,
     build_llm,
     build_model_from_env,
@@ -94,3 +95,21 @@ def test_build_llm_keeps_other_ids_on_openai(monkeypatch):
     model = build_llm("gpt-5.2")
     assert isinstance(model, OpenAIChatModel) and not isinstance(model, GoogleModel)
     assert model.model_name == "gpt-5.2"
+    assert "api.openai.com" in model.base_url  # the OpenAI path is untouched
+
+
+def test_build_llm_routes_groq_ids_to_groq_endpoint(monkeypatch):
+    monkeypatch.setenv("GROQ_API_KEY", "gsk-test")
+    for mid, served in (("groq:openai/gpt-oss-120b", "openai/gpt-oss-120b"),
+                        ("groq/compound", "groq/compound")):
+        model = build_llm(mid)
+        assert isinstance(model, OpenAIChatModel)
+        assert model.model_name == served  # the groq: prefix is not sent to Groq
+        assert model.base_url.startswith(GROQ_BASE_URL)
+
+
+def test_groq_without_its_key_refuses_rather_than_sending_the_openai_key(monkeypatch):
+    monkeypatch.delenv("GROQ_API_KEY", raising=False)
+    monkeypatch.setenv("OPENAI_API_KEY", "sk-must-not-leak")
+    with pytest.raises(ValueError, match="GROQ_API_KEY"):
+        build_llm("groq:openai/gpt-oss-120b")

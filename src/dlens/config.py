@@ -127,18 +127,21 @@ def build_model_from_env() -> Model:
 # Hosted-LLM selection for the AI-Scientist agents (planner / search / judge).
 # Local models hallucinate on structured tool output, so these default to a
 # hosted model: gpt-5.6-luna (chosen over gpt-5.2 — comparable results, faster,
-# ~2-3x cheaper). Override with DLENS_LLM (e.g. DLENS_LLM=gpt-5.2, or a gemini-*
-# id for Google Gemini).
+# ~2-3x cheaper). Override with DLENS_LLM (e.g. DLENS_LLM=gpt-5.2, a gemini-* id
+# for Google Gemini, or groq:<model id> for a Groq-served model).
 # --------------------------------------------------------------------------- #
 
 DEFAULT_LLM = "gpt-5.6-luna"
+GROQ_BASE_URL = "https://api.groq.com/openai/v1"
 
 
 def build_llm(model_id: str | None = None) -> Model:
     """Build the hosted LLM for AI-Scientist reasoning.
 
-    gemini-* ids use Google's Gemini API (reads GOOGLE_API_KEY, then GEMINI_API_KEY);
-    all other ids use OpenAI (reads OPENAI_API_KEY).
+    gemini-* ids use Google's Gemini API (reads GOOGLE_API_KEY, then GEMINI_API_KEY).
+    groq:<id> ids use Groq's OpenAI-compatible API (reads GROQ_API_KEY), e.g.
+    groq:openai/gpt-oss-120b; Groq's own groq/... and groq-... ids route there
+    unprefixed. All other ids use OpenAI (reads OPENAI_API_KEY).
 
     gpt-5.6* models REQUIRE the OpenAI Responses API: they reject function tools
     on chat completions when reasoning is enabled (HTTP 400), which breaks
@@ -147,6 +150,13 @@ def build_llm(model_id: str | None = None) -> Model:
     mid = (model_id or os.getenv("DLENS_LLM") or DEFAULT_LLM).strip()
     if mid.startswith("gemini"):
         return GeminiModel(model_name=mid)
+    if mid.startswith(("groq:", "groq/", "groq-")):
+        # Never let the SDK fall back to OPENAI_API_KEY: that would send it to Groq.
+        key = os.getenv("GROQ_API_KEY")
+        if not key:
+            raise ValueError(f"GROQ_API_KEY is not set (required for DLENS_LLM={mid!r})")
+        return OpenAIModel(model_name=mid.removeprefix("groq:"), base_url=GROQ_BASE_URL,
+                           api_key=key)
     if mid.startswith("gpt-5.6"):
         from pydantic_ai.models.openai import OpenAIResponsesModel
 
