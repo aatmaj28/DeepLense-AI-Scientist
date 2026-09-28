@@ -1,0 +1,5 @@
+{
+  "image_id": "sha256:59fdb7595ac3b634228589b6c88a020e2b634e065e68a99cec98ce8755fd8f28",
+  "pyhalo_commit_in_image": "64582dbd2342c31f6f40c5b4657955ad483e78e7",
+  "note": "pip freeze lists pyHalo only as an editable install (-e /opt/pyHalo); this is the commit checked out in the built image."
+}

@@ -1,0 +1,14 @@
+astropy==5.3.4
+click==8.5.0
+colossus==1.4.0
+configparser==7.2.0
+DeepLenseSim @ git+https://github.com/mwt5345/DeepLenseSim.git@a0c01910820a1c30593c56e728c7fdb3ac3701b4
+lenstronomy==1.9.2
+numpy==1.26.4
+packaging==26.3
+pyerfa==2.0.1.5
+# Editable Git install with no remote (pyHalo==0.1.0)
+-e /opt/pyHalo
+PyYAML==6.0.3
+scipy==1.13.1
+six==1.17.0

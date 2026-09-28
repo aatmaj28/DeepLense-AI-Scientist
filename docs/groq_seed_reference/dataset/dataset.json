@@ -1,0 +1,122 @@
+{
+  "started_utc": "2026-09-28T19:42:56Z",
+  "generation_wall_s": 1619.6,
+  "classes": [
+    "no_sub",
+    "cdm",
+    "axion"
+  ],
+  "seeds": {
+    "pool": {
+      "no_sub": 1001,
+      "cdm": 1002,
+      "axion": 1003
+    },
+    "test": {
+      "no_sub": 2001,
+      "cdm": 2002,
+      "axion": 2003
+    },
+    "split": 0
+  },
+  "counts": {
+    "pool_per_class": 3000,
+    "test_per_class": 600,
+    "model1/train": 7200,
+    "model1/val": 1800,
+    "model1/train_small": 1800,
+    "model1_test": 1800
+  },
+  "rules": {
+    "split": "scripts/prepare_deeplense_dataset.py --seed 0 --val-frac 0.2 (seeded shuffle of sorted filenames per class)",
+    "train_small": "first 600 files per class of model1/train (<cls>_00000 .. by index; the split shuffle makes this a seeded random sample)"
+  },
+  "jobs": [
+    {
+      "split": "pool",
+      "cls": "no_sub",
+      "seed": 1001,
+      "count": 3000,
+      "returncode": 0,
+      "files": 3000,
+      "wall_s": 1581.6,
+      "attempts": 3000,
+      "log": "pool_no_sub.log"
+    },
+    {
+      "split": "pool",
+      "cls": "cdm",
+      "seed": 1002,
+      "count": 3000,
+      "returncode": 0,
+      "files": 3000,
+      "wall_s": 1594.4,
+      "attempts": 3000,
+      "log": "pool_cdm.log"
+    },
+    {
+      "split": "pool",
+      "cls": "axion",
+      "seed": 1003,
+      "count": 3000,
+      "returncode": 0,
+      "files": 3000,
+      "wall_s": 1619.6,
+      "attempts": 3000,
+      "log": "pool_axion.log"
+    },
+    {
+      "split": "test",
+      "cls": "no_sub",
+      "seed": 2001,
+      "count": 600,
+      "returncode": 0,
+      "files": 600,
+      "wall_s": 299.5,
+      "attempts": 600,
+      "log": "test_no_sub.log"
+    },
+    {
+      "split": "test",
+      "cls": "cdm",
+      "seed": 2002,
+      "count": 600,
+      "returncode": 0,
+      "files": 600,
+      "wall_s": 335.6,
+      "attempts": 600,
+      "log": "test_cdm.log"
+    },
+    {
+      "split": "test",
+      "cls": "axion",
+      "seed": 2003,
+      "count": 600,
+      "returncode": 0,
+      "files": 600,
+      "wall_s": 370.8,
+      "attempts": 600,
+      "log": "test_axion.log"
+    }
+  ],
+  "docker_command_template": "docker run --rm --network none --user 501:20 -e HOME=/tmp -e OMP_NUM_THREADS=1 -e OPENBLAS_NUM_THREADS=1 -e MKL_NUM_THREADS=1 -v /Users/aj/GSoC/DeepLense-AI-Scientist/scripts:/scripts:ro -v <outdir>:/out dlens-lenstronomy:latest python /scripts/gen_model1_dataset.py <cls> 0 /out 0",
+  "image": {
+    "tag": "dlens-lenstronomy:latest",
+    "id": "sha256:59fdb7595ac3b634228589b6c88a020e2b634e065e68a99cec98ce8755fd8f28",
+    "python": "Python 3.10.21"
+  },
+  "generator_sha256": "86a423a1a65c21415eb68fda0cf9f426b6eb5012b390c783b498df75a4e30247",
+  "repo_commit": "2ba86beef18bf7495d614fdc4c8f782058163c7d",
+  "host": {
+    "docker": "29.5.2",
+    "colima": [
+      "colima version 0.10.3"
+    ]
+  },
+  "hash_check": {
+    "files": 10800,
+    "test_pool_overlap": 0,
+    "duplicates_pool": 0,
+    "duplicates_test": 0
+  }
+}
