@@ -1,7 +1,7 @@
 # Known issues: silent-repair paths in the agent loop
 
 **Recorded: 2026-09-28** · Found while building a strict structured-output check for a
-second LLM provider (see §3).
+second LLM provider (see §4).
 
 These belong to the same class as the guard-attribution finding in
 `docs/AGENT_RELIABILITY.md` §0. In each case the code quietly substitutes for, or
@@ -10,7 +10,7 @@ normal. None of them is known to have changed a recorded result (the evidence is
 given per issue), but each one would let a misbehaving model produce a run that
 looks successful.
 
-Neither issue below has been fixed. The code at the cited lines is unchanged.
+None of §1–§3 has been fixed. The code at the cited lines is unchanged.
 
 ---
 
@@ -100,7 +100,48 @@ prompt.
 
 ---
 
-## 3. Gemini support: added, not verified against a live model
+## 3. `PlannerDecision` can never be decoded under strict mode
+
+**Where:** `src/dlens/schemas/_experiment.py:37-39`, `updated_params: dict[str, Any]`
+
+**Behaviour:** strict (constrained) decoding needs every object to be closed
+(`additionalProperties: false`) and every field to be required. An open dict cannot
+meet that, so pydantic-ai never asks for strict mode on the planner's output tool.
+The model generates the JSON on a best-effort basis, and only pydantic validation
+afterwards (with `retries=2` re-asks) enforces its shape.
+
+Nothing enforces what `updated_params` contains, and that field is exactly where §2's
+silent ignores happen. So a `PlannerDecision` that validates proves only that the
+JSON parsed. What it asks for has to be checked separately. The strict gate
+(`scripts/check_structured_output.py`) does that check; production does not.
+
+**This is not specific to any provider, and it applies to the recorded gpt-5.2
+runs.** I captured the request payloads offline through a mock transport. The
+pydantic-ai version was 2.1.0, which `uv.lock` has pinned since 2026-06-29, so it
+covers every recorded run. The planner and judge schemas were unchanged over that
+period (checked at `f450b2b`).
+
+| Path | Planner output tool | Judge output tool |
+|---|---|---|
+| gpt-5.2 (Chat Completions) | `strict=None` | `strict=True` |
+| gpt-5.6-luna (Responses API) | `strict=False` | `strict=True` |
+| Groq (OpenAI-compatible endpoint) | `strict=None` | `strict=True` (Groq documents `strict` only for `response_format`, not for tools) |
+
+**The judge is the reverse case, with a limit.** `JudgeVerdict` (`reasoning: str`,
+`ranking: list[int]`) *is* strict-compatible, so on OpenAI its shape is constrained.
+But a schema can only guarantee "a list of integers". It cannot guarantee "an exact
+permutation of `range(n)`". So §1's repair path still applies under strict decoding.
+The Luna judge's omitted candidate (§1) happened with `strict=True` on the judge tool.
+
+**Suggested fix (not applied):** replace the open dict with closed, typed models of
+the settings `_apply` can actually apply: the `_CFG_KEYS` as training overrides and
+the `_ARCH_KEYS` as architecture overrides. That would make the planner schema
+strict-compatible, turn unknown keys into schema errors instead of silent drops, and
+remove §2's main failure mode.
+
+---
+
+## 4. Gemini support: added, not verified against a live model
 
 Branch `exp/gemini-seed-reference` adds `GeminiModel` (`src/dlens/agents/_models.py`,
 using the native pydantic-ai Google provider) and routes `gemini-*` ids in
@@ -118,8 +159,8 @@ got 0 responses out of 20 calls: 6 × HTTP 503 ("high demand"), then 14 × HTTP 
 No transport-level retry is configured. A transient 429 or 503 during a planner call
 therefore aborts the run.
 
-Before using Gemini in any recorded experiment, run a strict check that turns every
-silent path above into a failure:
+Before using Gemini in any recorded experiment, run `scripts/check_structured_output.py`,
+which turns every silent path above into a failure:
 
 - the judge ranking must be an exact permutation;
 - no planner key may be one that `_apply` would ignore;
