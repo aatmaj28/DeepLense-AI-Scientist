@@ -1,0 +1,46 @@
+{
+  "experiment": "A",
+  "run_id": "expA_cnn_medium_s4_seed3",
+  "seed": 3,
+  "architecture": {
+    "name": "cnn_medium_s4",
+    "family": "cnn",
+    "input_shape": [
+      150,
+      150
+    ],
+    "channels": 1,
+    "num_classes": 3,
+    "depths": [
+      2,
+      3,
+      3,
+      4
+    ],
+    "widths": [
+      32,
+      64,
+      128,
+      256
+    ],
+    "physics_informed": false,
+    "rationale": ""
+  },
+  "protocol": {
+    "tune_epochs": 25,
+    "tune_iterations": 4,
+    "train_dir": "train_small",
+    "val_dir": "val",
+    "n_train": 1800,
+    "n_val": 1800
+  },
+  "environment": {
+    "git_commit": "bc40d0ed3c1c6093b1f85aa3ac04dfda11a088c1",
+    "llm": "openai/gpt-oss-120b",
+    "llm_base_url": "https://api.groq.com/openai/v1/",
+    "python": "3.12.13",
+    "torch": "2.13.0",
+    "device": "mps",
+    "platform": "macOS-27.0-arm64-arm-64bit"
+  }
+}

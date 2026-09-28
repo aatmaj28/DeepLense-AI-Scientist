@@ -1,0 +1,63 @@
+    effective LLM   : OpenAIModel model_name=openai/gpt-oss-120b base_url=https://api.groq.com/openai/v1/  (DLENS_LLM=groq:openai/gpt-oss-120b)
+
+=== iteration 0: arch=cnn_medium_s4 dropout=0.0 augment=False wd=0.0001 epochs=25 es_patience=0 ===
+    epoch 1/25  loss=1.1100  acc=0.3267
+    epoch 2/25  loss=1.0995  acc=0.3411
+    epoch 3/25  loss=1.1013  acc=0.3617
+    epoch 4/25  loss=1.0954  acc=0.3728
+    epoch 5/25  loss=1.0999  acc=0.3628
+    epoch 6/25  loss=1.1002  acc=0.3450
+    epoch 7/25  loss=1.0926  acc=0.3761
+    epoch 8/25  loss=1.0818  acc=0.3928
+    epoch 9/25  loss=1.0293  acc=0.5194
+    epoch 10/25  loss=0.8909  acc=0.6156
+    epoch 11/25  loss=0.7779  acc=0.7033
+    epoch 12/25  loss=0.6954  acc=0.7322
+    epoch 13/25  loss=0.6174  acc=0.7600
+    epoch 14/25  loss=0.5821  acc=0.7822
+    epoch 15/25  loss=0.5183  acc=0.8000
+    epoch 16/25  loss=0.4674  acc=0.8244
+    epoch 17/25  loss=0.4186  acc=0.8556
+    epoch 18/25  loss=0.3693  acc=0.8739
+    epoch 19/25  loss=0.2966  acc=0.9161
+    epoch 20/25  loss=0.2634  acc=0.9283
+    epoch 21/25  loss=0.1884  acc=0.9656
+    epoch 22/25  loss=0.1745  acc=0.9728
+    epoch 23/25  loss=0.1554  acc=0.9772
+    epoch 24/25  loss=0.1307  acc=0.9889
+    epoch 25/25  loss=0.1314  acc=0.9889
+    train=0.9889  val=0.8206  gap=0.1683  auc=0.9392
+    planner[react]: train {'training': {'dropout': 0.2, 'early_stop_patience': 5}}
+    reasoning: Train accuracy is 0.989 while validation accuracy is only 0.821 (gap ~0.17), indicating overfitting. Adding regularization should close the gap. Introducing dropout=0.2 and enabling early stopping (patience=5) are minimal interventions to reduce overfitting without altering the architecture.
+
+=== iteration 1: arch=cnn_medium_s4 dropout=0.2 augment=False wd=0.0001 epochs=25 es_patience=5 ===
+    epoch 1/25  loss=1.1145  acc=0.3265  holdout=0.3444
+    epoch 2/25  loss=1.1067  acc=0.3395  holdout=0.3222
+    epoch 3/25  loss=1.1063  acc=0.3432  holdout=0.3056
+    epoch 4/25  loss=1.1024  acc=0.3623  holdout=0.3222
+    epoch 5/25  loss=1.0968  acc=0.3605  holdout=0.3833
+    epoch 6/25  loss=1.0981  acc=0.3444  holdout=0.2778
+    epoch 7/25  loss=1.0987  acc=0.3685  holdout=0.3167
+    epoch 8/25  loss=1.0939  acc=0.3759  holdout=0.3389
+    epoch 9/25  loss=1.0938  acc=0.3611  holdout=0.3111
+    epoch 10/25  loss=1.1005  acc=0.3340  holdout=0.3444
+    early stop at epoch 10 (best holdout=0.3833)
+    train=0.3340  val=0.3367  gap=-0.0027  auc=0.4998
+    [guard] gap -0.003 <= 0.06 but val 0.3367 below floor 0.383 (chance 0.333) — failed intervention, not convergence; continuing.
+    planner[react]: train {'training': {'dropout': 0.1, 'early_stop_patience': 5}}
+    reasoning: After adding dropout=0.2 the model's train accuracy fell to 0.334 and validation to 0.337, indicating severe underfitting (train loss 1.10). The previous high train accuracy (0.989) showed overfitting, but dropout=0.2 is too strong. Reducing dropout to a milder level (0.1) should restore learning ca
+
+=== iteration 2: arch=cnn_medium_s4 dropout=0.1 augment=False wd=0.0001 epochs=25 es_patience=5 ===
+    epoch 1/25  loss=1.1132  acc=0.3284  holdout=0.3333
+    epoch 2/25  loss=1.1029  acc=0.3259  holdout=0.3278
+    epoch 3/25  loss=1.1024  acc=0.3525  holdout=0.3611
+    epoch 4/25  loss=1.1043  acc=0.3438  holdout=0.2944
+    epoch 5/25  loss=1.1017  acc=0.3580  holdout=0.3167
+    epoch 6/25  loss=1.1005  acc=0.3617  holdout=0.3278
+    epoch 7/25  loss=1.1016  acc=0.3593  holdout=0.3222
+    epoch 8/25  loss=1.1000  acc=0.3519  holdout=0.3611
+    early stop at epoch 8 (best holdout=0.3611)
+    train=0.3519  val=0.3467  gap=0.0052  auc=0.5206
+    [guard] gap 0.005 <= 0.06 but val 0.3467 below floor 0.383 (chance 0.333) — failed intervention, not convergence; continuing.
+    best-val iteration: it0 val=0.8206 (of 3 iterations, 14.3 min)
+    TEST (once, n=1800): acc=0.8272 auc=0.9398

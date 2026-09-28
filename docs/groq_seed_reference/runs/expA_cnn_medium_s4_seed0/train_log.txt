@@ -1,0 +1,87 @@
+    effective LLM   : OpenAIModel model_name=openai/gpt-oss-120b base_url=https://api.groq.com/openai/v1/  (DLENS_LLM=groq:openai/gpt-oss-120b)
+
+=== iteration 0: arch=cnn_medium_s4 dropout=0.0 augment=False wd=0.0001 epochs=25 es_patience=0 ===
+    epoch 1/25  loss=1.1155  acc=0.3144
+    epoch 2/25  loss=1.1012  acc=0.3433
+    epoch 3/25  loss=1.0987  acc=0.3489
+    epoch 4/25  loss=1.0990  acc=0.3461
+    epoch 5/25  loss=1.0936  acc=0.3767
+    epoch 6/25  loss=1.0762  acc=0.4122
+    epoch 7/25  loss=0.9764  acc=0.5517
+    epoch 8/25  loss=0.7616  acc=0.6761
+    epoch 9/25  loss=0.6042  acc=0.7611
+    epoch 10/25  loss=0.5554  acc=0.7744
+    epoch 11/25  loss=0.4655  acc=0.8217
+    epoch 12/25  loss=0.3960  acc=0.8461
+    epoch 13/25  loss=0.3250  acc=0.8878
+    epoch 14/25  loss=0.2829  acc=0.9028
+    epoch 15/25  loss=0.2659  acc=0.9122
+    epoch 16/25  loss=0.1954  acc=0.9328
+    epoch 17/25  loss=0.1494  acc=0.9628
+    epoch 18/25  loss=0.1102  acc=0.9794
+    epoch 19/25  loss=0.0884  acc=0.9867
+    epoch 20/25  loss=0.0741  acc=0.9928
+    epoch 21/25  loss=0.0575  acc=0.9956
+    epoch 22/25  loss=0.0476  acc=0.9983
+    epoch 23/25  loss=0.0462  acc=0.9989
+    epoch 24/25  loss=0.0446  acc=0.9983
+    epoch 25/25  loss=0.0450  acc=0.9967
+    train=0.9967  val=0.8317  gap=0.1650  auc=0.9473
+    planner[react]: train {'training': {'dropout': 0.2, 'early_stop_patience': 5}}
+    reasoning: The model achieves very high training accuracy (0.9967) but validation accuracy is considerably lower (0.8317), indicating overfitting. Adding regularization via dropout is the minimal intervention to reduce this gap. A modest dropout rate (0.2) is chosen to increase robustness without drastically a
+
+=== iteration 1: arch=cnn_medium_s4 dropout=0.2 augment=False wd=0.0001 epochs=25 es_patience=5 ===
+    epoch 1/25  loss=1.1201  acc=0.3167  holdout=0.2778
+    epoch 2/25  loss=1.1014  acc=0.3512  holdout=0.3111
+    epoch 3/25  loss=1.1082  acc=0.3457  holdout=0.2556
+    epoch 4/25  loss=1.1010  acc=0.3494  holdout=0.3111
+    epoch 5/25  loss=1.1065  acc=0.3358  holdout=0.3500
+    epoch 6/25  loss=1.1027  acc=0.3698  holdout=0.3778
+    epoch 7/25  loss=1.1003  acc=0.3698  holdout=0.3222
+    epoch 8/25  loss=1.0889  acc=0.3901  holdout=0.2556
+    epoch 9/25  loss=1.0382  acc=0.4827  holdout=0.3889
+    epoch 10/25  loss=0.9150  acc=0.5883  holdout=0.3778
+    epoch 11/25  loss=0.7195  acc=0.6951  holdout=0.4222
+    epoch 12/25  loss=0.5767  acc=0.7765  holdout=0.5944
+    epoch 13/25  loss=0.5163  acc=0.8019  holdout=0.6222
+    epoch 14/25  loss=0.4466  acc=0.8327  holdout=0.6056
+    epoch 15/25  loss=0.4009  acc=0.8568  holdout=0.5889
+    epoch 16/25  loss=0.3621  acc=0.8617  holdout=0.3722
+    epoch 17/25  loss=0.3044  acc=0.8981  holdout=0.6778
+    epoch 18/25  loss=0.2683  acc=0.9117  holdout=0.8111
+    epoch 19/25  loss=0.2173  acc=0.9340  holdout=0.6778
+    epoch 20/25  loss=0.1892  acc=0.9506  holdout=0.8000
+    epoch 21/25  loss=0.1656  acc=0.9605  holdout=0.8222
+    epoch 22/25  loss=0.1409  acc=0.9735  holdout=0.8056
+    epoch 23/25  loss=0.1260  acc=0.9827  holdout=0.8000
+    epoch 24/25  loss=0.1188  acc=0.9821  holdout=0.8222
+    epoch 25/25  loss=0.1114  acc=0.9840  holdout=0.8111
+    train=0.9840  val=0.8328  gap=0.1512  auc=0.9426
+    planner[react]: train {'training': {'augment': True}}
+    reasoning: Validation accuracy remains ~0.833 despite adding dropout 0.2 (train 0.984 vs val 0.833 gap 0.15). The model still overfits, and class 'cdm' recall dropped to 0.68. Adding data augmentation is the smallest new regularization step to improve generalization without altering architecture. Keep dropout 
+
+=== iteration 2: arch=cnn_medium_s4 dropout=0.2 augment=True wd=0.0001 epochs=25 es_patience=5 ===
+    epoch 1/25  loss=1.1199  acc=0.3284  holdout=0.2889
+    epoch 2/25  loss=1.1064  acc=0.3278  holdout=0.3000
+    epoch 3/25  loss=1.1058  acc=0.3469  holdout=0.3056
+    epoch 4/25  loss=1.1055  acc=0.3438  holdout=0.2278
+    epoch 5/25  loss=1.1042  acc=0.3660  holdout=0.3500
+    epoch 6/25  loss=1.1014  acc=0.3426  holdout=0.3611
+    epoch 7/25  loss=1.1037  acc=0.3623  holdout=0.3389
+    epoch 8/25  loss=1.0919  acc=0.3691  holdout=0.4333
+    epoch 9/25  loss=1.0485  acc=0.4488  holdout=0.3778
+    epoch 10/25  loss=0.9326  acc=0.5833  holdout=0.5667
+    epoch 11/25  loss=0.7522  acc=0.6988  holdout=0.4556
+    epoch 12/25  loss=0.6873  acc=0.7191  holdout=0.3667
+    epoch 13/25  loss=0.5981  acc=0.7574  holdout=0.5222
+    epoch 14/25  loss=0.5349  acc=0.7889  holdout=0.4611
+    epoch 15/25  loss=0.4994  acc=0.7988  holdout=0.7278
+    epoch 16/25  loss=0.4566  acc=0.8247  holdout=0.3667
+    epoch 17/25  loss=0.4244  acc=0.8395  holdout=0.6167
+    epoch 18/25  loss=0.4210  acc=0.8407  holdout=0.4056
+    epoch 19/25  loss=0.3732  acc=0.8562  holdout=0.6611
+    epoch 20/25  loss=0.3696  acc=0.8580  holdout=0.7222
+    early stop at epoch 20 (best holdout=0.7278)
+    train=0.8580  val=0.7383  gap=0.1197  auc=0.9179
+    best-val iteration: it1 val=0.8328 (of 3 iterations, 21.6 min)
+    TEST (once, n=1800): acc=0.8178 auc=0.9407

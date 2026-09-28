@@ -1,0 +1,91 @@
+    effective LLM   : OpenAIModel model_name=openai/gpt-oss-120b base_url=https://api.groq.com/openai/v1/  (DLENS_LLM=groq:openai/gpt-oss-120b)
+
+=== iteration 0: arch=cnn_medium_s4 dropout=0.0 augment=False wd=0.0001 epochs=25 es_patience=0 ===
+    epoch 1/25  loss=1.1130  acc=0.3361
+    epoch 2/25  loss=1.0990  acc=0.3706
+    epoch 3/25  loss=1.0940  acc=0.3706
+    epoch 4/25  loss=1.0522  acc=0.4794
+    epoch 5/25  loss=0.9116  acc=0.6217
+    epoch 6/25  loss=0.7567  acc=0.6956
+    epoch 7/25  loss=0.6494  acc=0.7383
+    epoch 8/25  loss=0.5759  acc=0.7711
+    epoch 9/25  loss=0.4913  acc=0.8094
+    epoch 10/25  loss=0.4073  acc=0.8433
+    epoch 11/25  loss=0.3653  acc=0.8789
+    epoch 12/25  loss=0.3149  acc=0.8839
+    epoch 13/25  loss=0.2712  acc=0.9167
+    epoch 14/25  loss=0.2024  acc=0.9422
+    epoch 15/25  loss=0.1557  acc=0.9622
+    epoch 16/25  loss=0.0865  acc=0.9861
+    epoch 17/25  loss=0.0640  acc=0.9967
+    epoch 18/25  loss=0.0492  acc=0.9989
+    epoch 19/25  loss=0.0340  acc=1.0000
+    epoch 20/25  loss=0.0293  acc=1.0000
+    epoch 21/25  loss=0.0257  acc=1.0000
+    epoch 22/25  loss=0.0239  acc=1.0000
+    epoch 23/25  loss=0.0258  acc=1.0000
+    epoch 24/25  loss=0.0230  acc=1.0000
+    epoch 25/25  loss=0.0215  acc=1.0000
+    train=1.0000  val=0.8167  gap=0.1833  auc=0.9409
+    planner[react]: train {'training': {'augment': True, 'dropout': 0.2}}
+    reasoning: The model achieves perfect training accuracy (1.0) but validation accuracy is only 0.817, indicating significant overfitting. Adding regularization should close the generalization gap. A modest dropout (0.2) and enabling data augmentation are the smallest changes likely to improve validation perform
+
+=== iteration 1: arch=cnn_medium_s4 dropout=0.2 augment=True wd=0.0001 epochs=25 es_patience=0 ===
+    epoch 1/25  loss=1.1260  acc=0.3306
+    epoch 2/25  loss=1.1055  acc=0.3367
+    epoch 3/25  loss=1.1018  acc=0.3561
+    epoch 4/25  loss=1.1094  acc=0.3200
+    epoch 5/25  loss=1.1055  acc=0.3406
+    epoch 6/25  loss=1.0998  acc=0.3350
+    epoch 7/25  loss=1.1036  acc=0.3333
+    epoch 8/25  loss=1.1033  acc=0.3306
+    epoch 9/25  loss=1.0871  acc=0.3878
+    epoch 10/25  loss=1.0503  acc=0.4589
+    epoch 11/25  loss=0.9600  acc=0.5433
+    epoch 12/25  loss=0.8606  acc=0.6339
+    epoch 13/25  loss=0.7590  acc=0.6956
+    epoch 14/25  loss=0.6588  acc=0.7278
+    epoch 15/25  loss=0.5483  acc=0.7972
+    epoch 16/25  loss=0.5168  acc=0.7989
+    epoch 17/25  loss=0.4424  acc=0.8356
+    epoch 18/25  loss=0.4378  acc=0.8261
+    epoch 19/25  loss=0.3993  acc=0.8444
+    epoch 20/25  loss=0.3782  acc=0.8594
+    epoch 21/25  loss=0.3668  acc=0.8611
+    epoch 22/25  loss=0.3523  acc=0.8700
+    epoch 23/25  loss=0.3396  acc=0.8772
+    epoch 24/25  loss=0.3279  acc=0.8772
+    epoch 25/25  loss=0.3330  acc=0.8756
+    train=0.8756  val=0.7128  gap=0.1628  auc=0.9466
+    planner[react]: train {'training': {'dropout': 0.1}}
+    reasoning: After adding dropout=0.2 and augmentation, training accuracy fell to 0.876 and validation accuracy dropped to 0.713, indicating the model is now underfitting (train accuracy far from perfect) and regularization may be too strong. The biggest gap is between train and validation (0.163) and recall for
+
+=== iteration 2: arch=cnn_medium_s4 dropout=0.1 augment=True wd=0.0001 epochs=25 es_patience=0 ===
+    epoch 1/25  loss=1.1187  acc=0.3389
+    epoch 2/25  loss=1.1009  acc=0.3467
+    epoch 3/25  loss=1.0851  acc=0.4000
+    epoch 4/25  loss=1.0623  acc=0.4256
+    epoch 5/25  loss=0.9530  acc=0.5811
+    epoch 6/25  loss=0.8500  acc=0.6256
+    epoch 7/25  loss=0.7596  acc=0.6778
+    epoch 8/25  loss=0.6879  acc=0.7094
+    epoch 9/25  loss=0.6527  acc=0.7300
+    epoch 10/25  loss=0.5967  acc=0.7572
+    epoch 11/25  loss=0.5484  acc=0.7772
+    epoch 12/25  loss=0.5021  acc=0.8061
+    epoch 13/25  loss=0.4577  acc=0.8122
+    epoch 14/25  loss=0.4221  acc=0.8261
+    epoch 15/25  loss=0.4164  acc=0.8322
+    epoch 16/25  loss=0.3925  acc=0.8439
+    epoch 17/25  loss=0.3628  acc=0.8639
+    epoch 18/25  loss=0.3376  acc=0.8644
+    epoch 19/25  loss=0.3237  acc=0.8744
+    epoch 20/25  loss=0.3103  acc=0.8833
+    epoch 21/25  loss=0.3069  acc=0.8878
+    epoch 22/25  loss=0.2890  acc=0.8878
+    epoch 23/25  loss=0.2831  acc=0.8928
+    epoch 24/25  loss=0.2804  acc=0.8961
+    epoch 25/25  loss=0.2779  acc=0.8967
+    train=0.8967  val=0.8672  gap=0.0295  auc=0.9646
+    best-val iteration: it2 val=0.8672 (of 3 iterations, 21.4 min)
+    TEST (once, n=1800): acc=0.8611 auc=0.9588

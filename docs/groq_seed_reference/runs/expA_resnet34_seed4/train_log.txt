@@ -1,0 +1,60 @@
+    effective LLM   : OpenAIModel model_name=openai/gpt-oss-120b base_url=https://api.groq.com/openai/v1/  (DLENS_LLM=groq:openai/gpt-oss-120b)
+
+=== iteration 0: arch=resnet34 dropout=0.0 augment=False wd=0.0001 epochs=25 es_patience=0 ===
+    epoch 1/25  loss=1.2119  acc=0.3244
+    epoch 2/25  loss=1.1383  acc=0.3228
+    epoch 3/25  loss=1.1070  acc=0.3739
+    epoch 4/25  loss=1.0626  acc=0.4172
+    epoch 5/25  loss=1.0254  acc=0.4694
+    epoch 6/25  loss=0.8618  acc=0.5511
+    epoch 7/25  loss=0.7278  acc=0.6317
+    epoch 8/25  loss=0.6486  acc=0.6744
+    epoch 9/25  loss=0.5756  acc=0.7322
+    epoch 10/25  loss=0.5520  acc=0.7378
+    epoch 11/25  loss=0.5005  acc=0.7622
+    epoch 12/25  loss=0.4500  acc=0.7950
+    epoch 13/25  loss=0.4511  acc=0.7900
+    epoch 14/25  loss=0.3749  acc=0.8311
+    epoch 15/25  loss=0.3447  acc=0.8467
+    epoch 16/25  loss=0.3088  acc=0.8744
+    epoch 17/25  loss=0.2620  acc=0.8906
+    epoch 18/25  loss=0.1758  acc=0.9283
+    epoch 19/25  loss=0.1543  acc=0.9411
+    epoch 20/25  loss=0.0652  acc=0.9806
+    epoch 21/25  loss=0.0439  acc=0.9889
+    epoch 22/25  loss=0.0511  acc=0.9844
+    epoch 23/25  loss=0.0313  acc=0.9922
+    epoch 24/25  loss=0.0175  acc=0.9972
+    epoch 25/25  loss=0.0164  acc=0.9967
+    train=0.9967  val=0.7178  gap=0.2789  auc=0.8677
+    planner[react]: train {'training': {'augment': True, 'early_stop_patience': 5}}
+    reasoning: The model achieves near-perfect training accuracy (0.9967) but validation accuracy is only 0.718, indicating a large generalization gap and overfitting. Introducing data augmentation will increase input diversity and help the network learn more robust features, addressing the overfitting without alt
+
+=== iteration 1: arch=resnet34 dropout=0.0 augment=True wd=0.0001 epochs=25 es_patience=5 ===
+    epoch 1/25  loss=1.2620  acc=0.3475  holdout=0.3667
+    epoch 2/25  loss=1.1139  acc=0.3463  holdout=0.2889
+    epoch 3/25  loss=1.1092  acc=0.3432  holdout=0.3833
+    epoch 4/25  loss=1.0906  acc=0.3735  holdout=0.3944
+    epoch 5/25  loss=1.0404  acc=0.4370  holdout=0.3889
+    epoch 6/25  loss=0.9655  acc=0.5093  holdout=0.4444
+    epoch 7/25  loss=0.8690  acc=0.5586  holdout=0.6278
+    epoch 8/25  loss=0.8209  acc=0.5957  holdout=0.5722
+    epoch 9/25  loss=0.7357  acc=0.6179  holdout=0.5222
+    epoch 10/25  loss=0.6845  acc=0.6556  holdout=0.6833
+    epoch 11/25  loss=0.6462  acc=0.6710  holdout=0.6222
+    epoch 12/25  loss=0.5983  acc=0.7154  holdout=0.6556
+    epoch 13/25  loss=0.5463  acc=0.7333  holdout=0.7333
+    epoch 14/25  loss=0.5479  acc=0.7395  holdout=0.7222
+    epoch 15/25  loss=0.5206  acc=0.7475  holdout=0.7444
+    epoch 16/25  loss=0.5797  acc=0.7228  holdout=0.7556
+    epoch 17/25  loss=0.5050  acc=0.7667  holdout=0.7167
+    epoch 18/25  loss=0.4711  acc=0.7821  holdout=0.8000
+    epoch 19/25  loss=0.4687  acc=0.7790  holdout=0.7667
+    epoch 20/25  loss=0.4504  acc=0.7975  holdout=0.7889
+    epoch 21/25  loss=0.4433  acc=0.7907  holdout=0.7889
+    epoch 22/25  loss=0.4175  acc=0.8056  holdout=0.7889
+    epoch 23/25  loss=0.4186  acc=0.8167  holdout=0.8000
+    early stop at epoch 23 (best holdout=0.8000)
+    train=0.8167  val=0.7939  gap=0.0228  auc=0.9122
+    best-val iteration: it1 val=0.7939 (of 2 iterations, 12.4 min)
+    TEST (once, n=1800): acc=0.7778 auc=0.9050

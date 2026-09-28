@@ -1,0 +1,246 @@
+{
+  "tuning_seconds": 1031.5,
+  "iterations": 3,
+  "best_iteration": 0,
+  "val_accuracy": 0.7511111111111111,
+  "val_macro_auc": 0.890637962962963,
+  "train_accuracy": 0.9956,
+  "gap": 0.24448888888888898,
+  "stop_reason": "[loop guard] val accuracy has not improved for 2 iterations.",
+  "trajectory": [
+    {
+      "iteration": 0,
+      "architecture": {
+        "name": "resnet34",
+        "family": "resnet",
+        "input_shape": [
+          150,
+          150
+        ],
+        "channels": 1,
+        "num_classes": 3,
+        "depths": null,
+        "widths": null,
+        "physics_informed": false,
+        "rationale": ""
+      },
+      "training_config": {
+        "loss": "cross_entropy",
+        "optimizer": "adamw",
+        "learning_rate": 0.0003,
+        "batch_size": 32,
+        "epochs": 25,
+        "weight_decay": 0.0001,
+        "lr_scheduler": "cosine",
+        "dropout": 0.0,
+        "augment": false,
+        "early_stop_patience": 0
+      },
+      "train_accuracy": 0.9956,
+      "val_accuracy": 0.7511111111111111,
+      "gap": 0.24448888888888898,
+      "val_macro_auc": 0.890637962962963,
+      "confusion_matrix": [
+        [
+          518,
+          82,
+          0
+        ],
+        [
+          39,
+          395,
+          166
+        ],
+        [
+          3,
+          158,
+          439
+        ]
+      ],
+      "weights_path": "/Users/aj/GSoC/deeplense_artifacts/groq_gpt-oss-120b_seeded_2026-09-28/experiment_a/expA_resnet34_seed0/_train_runs/a57571a4/model.pt",
+      "planner_action": "train",
+      "planner_reasoning": "The model achieves near\u2011perfect training accuracy (0.996) but validation accuracy is only 0.751, indicating a strong generalization gap (overfitting). Class 'cdm' also has the lowest recall (0.658). The smallest effective regularization is to introduce dropout, which can reduce over\u2011fitting without changing model capacity. Adding a modest dropout rate (0.2) and enabling early stopping (patience 5) should help the model generalize better.",
+      "planner_updated_params": {
+        "training": {
+          "dropout": 0.2,
+          "early_stop_patience": 5
+        }
+      }
+    },
+    {
+      "iteration": 1,
+      "architecture": {
+        "name": "resnet34",
+        "family": "resnet",
+        "input_shape": [
+          150,
+          150
+        ],
+        "channels": 1,
+        "num_classes": 3,
+        "depths": null,
+        "widths": null,
+        "physics_informed": false,
+        "rationale": ""
+      },
+      "training_config": {
+        "loss": "cross_entropy",
+        "optimizer": "adamw",
+        "learning_rate": 0.0003,
+        "batch_size": 32,
+        "epochs": 25,
+        "weight_decay": 0.0001,
+        "lr_scheduler": "cosine",
+        "dropout": 0.2,
+        "augment": false,
+        "early_stop_patience": 5
+      },
+      "train_accuracy": 0.8988,
+      "val_accuracy": 0.6977777777777778,
+      "gap": 0.2010222222222222,
+      "val_macro_auc": 0.8561912037037036,
+      "confusion_matrix": [
+        [
+          520,
+          79,
+          1
+        ],
+        [
+          67,
+          250,
+          283
+        ],
+        [
+          4,
+          110,
+          486
+        ]
+      ],
+      "weights_path": "/Users/aj/GSoC/deeplense_artifacts/groq_gpt-oss-120b_seeded_2026-09-28/experiment_a/expA_resnet34_seed0/_train_runs/29ab8e3b/model.pt",
+      "planner_action": "train",
+      "planner_reasoning": "After adding dropout=0.2 the validation accuracy fell from 0.751 to 0.698 and the train/val gap remained large (train 0.899 vs val 0.698). This suggests the model is now under\u2011fitting due to excessive regularization. Reducing dropout to a modest 0.1 should restore capacity while still providing some regularization, aiming to close the generalization gap without changing architecture.",
+      "planner_updated_params": {
+        "training": {
+          "dropout": 0.1,
+          "early_stop_patience": 5
+        }
+      }
+    },
+    {
+      "iteration": 2,
+      "architecture": {
+        "name": "resnet34",
+        "family": "resnet",
+        "input_shape": [
+          150,
+          150
+        ],
+        "channels": 1,
+        "num_classes": 3,
+        "depths": null,
+        "widths": null,
+        "physics_informed": false,
+        "rationale": ""
+      },
+      "training_config": {
+        "loss": "cross_entropy",
+        "optimizer": "adamw",
+        "learning_rate": 0.0003,
+        "batch_size": 32,
+        "epochs": 25,
+        "weight_decay": 0.0001,
+        "lr_scheduler": "cosine",
+        "dropout": 0.1,
+        "augment": false,
+        "early_stop_patience": 5
+      },
+      "train_accuracy": 0.9747,
+      "val_accuracy": 0.6972222222222222,
+      "gap": 0.2774777777777778,
+      "val_macro_auc": 0.8583250000000001,
+      "confusion_matrix": [
+        [
+          501,
+          98,
+          1
+        ],
+        [
+          70,
+          272,
+          258
+        ],
+        [
+          6,
+          112,
+          482
+        ]
+      ],
+      "weights_path": "/Users/aj/GSoC/deeplense_artifacts/groq_gpt-oss-120b_seeded_2026-09-28/experiment_a/expA_resnet34_seed0/_train_runs/37b12e3c/model.pt",
+      "planner_action": "report",
+      "planner_reasoning": "[loop guard] val accuracy has not improved for 2 iterations.",
+      "planner_updated_params": {}
+    }
+  ],
+  "test": {
+    "n_test": 1800,
+    "test_accuracy": 0.7433333333333333,
+    "test_macro_auc": 0.8842064814814815,
+    "per_class": {
+      "no_sub": {
+        "precision": 0.9173,
+        "recall": 0.85,
+        "f1": 0.8824,
+        "support": 600.0
+      },
+      "cdm": {
+        "precision": 0.611,
+        "recall": 0.6467,
+        "f1": 0.6283,
+        "support": 600.0
+      },
+      "axion": {
+        "precision": 0.7225,
+        "recall": 0.7333,
+        "f1": 0.7279,
+        "support": 600.0
+      }
+    },
+    "confusion_matrix": [
+      [
+        510,
+        90,
+        0
+      ],
+      [
+        43,
+        388,
+        169
+      ],
+      [
+        3,
+        157,
+        440
+      ]
+    ]
+  },
+  "checkpoints": [
+    {
+      "run_id": "29ab8e3b",
+      "file": "checkpoints/29ab8e3b.pt",
+      "bytes": 85243851
+    },
+    {
+      "run_id": "37b12e3c",
+      "file": "checkpoints/37b12e3c.pt",
+      "bytes": 85243851
+    },
+    {
+      "run_id": "a57571a4",
+      "file": "checkpoints/a57571a4.pt",
+      "bytes": 85243851
+    }
+  ],
+  "run_id": "expA_resnet34_seed0",
+  "architecture": "resnet34",
+  "seed": 0
+}

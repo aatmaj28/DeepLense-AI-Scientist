@@ -1,0 +1,182 @@
+{
+  "tuning_seconds": 744.2,
+  "iterations": 2,
+  "best_iteration": 1,
+  "val_accuracy": 0.7938888888888889,
+  "val_macro_auc": 0.9122282407407408,
+  "train_accuracy": 0.8167,
+  "gap": 0.022811111111111115,
+  "stop_reason": "[loop guard] train/val gap 0.023 <= threshold 0.06 \u2014 gap closed.",
+  "trajectory": [
+    {
+      "iteration": 0,
+      "architecture": {
+        "name": "resnet34",
+        "family": "resnet",
+        "input_shape": [
+          150,
+          150
+        ],
+        "channels": 1,
+        "num_classes": 3,
+        "depths": null,
+        "widths": null,
+        "physics_informed": false,
+        "rationale": ""
+      },
+      "training_config": {
+        "loss": "cross_entropy",
+        "optimizer": "adamw",
+        "learning_rate": 0.0003,
+        "batch_size": 32,
+        "epochs": 25,
+        "weight_decay": 0.0001,
+        "lr_scheduler": "cosine",
+        "dropout": 0.0,
+        "augment": false,
+        "early_stop_patience": 0
+      },
+      "train_accuracy": 0.9967,
+      "val_accuracy": 0.7177777777777777,
+      "gap": 0.2789222222222223,
+      "val_macro_auc": 0.8677060185185185,
+      "confusion_matrix": [
+        [
+          529,
+          71,
+          0
+        ],
+        [
+          60,
+          371,
+          169
+        ],
+        [
+          4,
+          204,
+          392
+        ]
+      ],
+      "weights_path": "/Users/aj/GSoC/deeplense_artifacts/groq_gpt-oss-120b_seeded_2026-09-28/experiment_a/expA_resnet34_seed4/_train_runs/0f4fba88/model.pt",
+      "planner_action": "train",
+      "planner_reasoning": "The model achieves near-perfect training accuracy (0.9967) but validation accuracy is only 0.718, indicating a large generalization gap and overfitting. Introducing data augmentation will increase input diversity and help the network learn more robust features, addressing the overfitting without altering model capacity. Early stopping patience is also set to 5 to halt training if validation performance stops improving.",
+      "planner_updated_params": {
+        "training": {
+          "augment": true,
+          "early_stop_patience": 5
+        }
+      }
+    },
+    {
+      "iteration": 1,
+      "architecture": {
+        "name": "resnet34",
+        "family": "resnet",
+        "input_shape": [
+          150,
+          150
+        ],
+        "channels": 1,
+        "num_classes": 3,
+        "depths": null,
+        "widths": null,
+        "physics_informed": false,
+        "rationale": ""
+      },
+      "training_config": {
+        "loss": "cross_entropy",
+        "optimizer": "adamw",
+        "learning_rate": 0.0003,
+        "batch_size": 32,
+        "epochs": 25,
+        "weight_decay": 0.0001,
+        "lr_scheduler": "cosine",
+        "dropout": 0.0,
+        "augment": true,
+        "early_stop_patience": 5
+      },
+      "train_accuracy": 0.8167,
+      "val_accuracy": 0.7938888888888889,
+      "gap": 0.022811111111111115,
+      "val_macro_auc": 0.9122282407407408,
+      "confusion_matrix": [
+        [
+          590,
+          10,
+          0
+        ],
+        [
+          52,
+          352,
+          196
+        ],
+        [
+          4,
+          109,
+          487
+        ]
+      ],
+      "weights_path": "/Users/aj/GSoC/deeplense_artifacts/groq_gpt-oss-120b_seeded_2026-09-28/experiment_a/expA_resnet34_seed4/_train_runs/c1938675/model.pt",
+      "planner_action": "report",
+      "planner_reasoning": "[loop guard] train/val gap 0.023 <= threshold 0.06 \u2014 gap closed.",
+      "planner_updated_params": {}
+    }
+  ],
+  "test": {
+    "n_test": 1800,
+    "test_accuracy": 0.7777777777777778,
+    "test_macro_auc": 0.9049736111111111,
+    "per_class": {
+      "no_sub": {
+        "precision": 0.9202,
+        "recall": 0.98,
+        "f1": 0.9492,
+        "support": 600.0
+      },
+      "cdm": {
+        "precision": 0.7417,
+        "recall": 0.5217,
+        "f1": 0.6125,
+        "support": 600.0
+      },
+      "axion": {
+        "precision": 0.6752,
+        "recall": 0.8317,
+        "f1": 0.7453,
+        "support": 600.0
+      }
+    },
+    "confusion_matrix": [
+      [
+        588,
+        12,
+        0
+      ],
+      [
+        47,
+        313,
+        240
+      ],
+      [
+        4,
+        97,
+        499
+      ]
+    ]
+  },
+  "checkpoints": [
+    {
+      "run_id": "0f4fba88",
+      "file": "checkpoints/0f4fba88.pt",
+      "bytes": 85243851
+    },
+    {
+      "run_id": "c1938675",
+      "file": "checkpoints/c1938675.pt",
+      "bytes": 85243851
+    }
+  ],
+  "run_id": "expA_resnet34_seed4",
+  "architecture": "resnet34",
+  "seed": 4
+}

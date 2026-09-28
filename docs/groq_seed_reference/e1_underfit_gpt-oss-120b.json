@@ -1,0 +1,367 @@
+{
+  "model": "groq:openai/gpt-oss-120b",
+  "llm_model_name": "openai/gpt-oss-120b",
+  "llm_base_url": "https://api.groq.com/openai/v1/",
+  "trials": 20,
+  "started_utc": "2026-09-28T23:30:34Z",
+  "states": {
+    "underfit": {
+      "provenance": "CONSTRUCTED PROBE \u2014 val/AUC/confusion verbatim from ai_scientist_run tuning iteration 0; train set to 0.6500 so train and val are both low with no gap",
+      "numbers": "train 0.6500 / val 0.6294 / gap 0.0206 / macro_auc 0.8068",
+      "expected": "add capacity or training (more epochs / larger model / higher LR); adding regularization would be harmful",
+      "trials": [
+        {
+          "trial": 1,
+          "action": "train",
+          "updated_params": {
+            "training": {
+              "early_stop_patience": 5,
+              "epochs": 50
+            }
+          },
+          "knobs": [
+            "training.early_stop_patience",
+            "training.epochs"
+          ],
+          "rationale": "Train accuracy (0.65) and validation accuracy (0.629) are close, showing a small generalization gap but low overall performance, indicating underfitting. Extending training should allow the model to better fit the data. No prior epoch increase has been tried, so we increase epochs to 50 and add a modest early stopping patience to avoid wasteful over\u2011training.",
+          "quality": "ok",
+          "seconds": 1.8
+        },
+        {
+          "trial": 2,
+          "action": "train",
+          "updated_params": {
+            "training": {
+              "epochs": 50
+            }
+          },
+          "knobs": [
+            "training.epochs"
+          ],
+          "rationale": "The model shows low train accuracy (0.65) and only a slight train\u2011validation gap (0.65 vs 0.629), indicating underfitting rather than overfitting. Extending training time gives the optimizer more opportunity to fit the data and improve both train and validation performance. No other changes have been tried yet, so the smallest intervention is to increase the number of epochs.",
+          "quality": "ok",
+          "seconds": 1.1
+        },
+        {
+          "trial": 3,
+          "action": "train",
+          "updated_params": {
+            "training": {
+              "early_stop_patience": 5,
+              "epochs": 50
+            }
+          },
+          "knobs": [
+            "training.early_stop_patience",
+            "training.epochs"
+          ],
+          "rationale": "Training accuracy (0.65) is significantly lower than the model's capacity would suggest, and validation accuracy (0.629) is almost identical, indicating underfitting rather than overfitting. The model has not yet converged within the 25 epochs. Extending training time should allow the network to learn more without altering architecture. No other changes have been attempted yet.",
+          "quality": "ok",
+          "seconds": 2.0
+        },
+        {
+          "trial": 4,
+          "action": "train",
+          "updated_params": {
+            "training": {
+              "epochs": 50
+            }
+          },
+          "knobs": [
+            "training.epochs"
+          ],
+          "rationale": "Both training accuracy (0.65) and validation accuracy (0.629) are relatively low and nearly identical, indicating the model is underfitting rather than overfitting. Extending the training duration gives the optimizer more opportunity to improve performance without altering the architecture. Increasing epochs from 25 to 50 is the minimal intervention to address this.",
+          "quality": "ok",
+          "seconds": 1.1
+        },
+        {
+          "trial": 5,
+          "action": "train",
+          "updated_params": {
+            "training": {
+              "early_stop_patience": 5,
+              "epochs": 50
+            }
+          },
+          "knobs": [
+            "training.early_stop_patience",
+            "training.epochs"
+          ],
+          "rationale": "The model is underfitting: train accuracy is only 0.65 and validation accuracy is 0.629, showing a minimal train\u2011validation gap. This suggests the network has not fully converged within the 25 epochs. The smallest effective fix is to allow more training time, extending epochs (e.g., to 50) and enabling early stopping to prevent over\u2011training later.",
+          "quality": "ok",
+          "seconds": 1.2
+        },
+        {
+          "trial": 6,
+          "action": "train",
+          "updated_params": {
+            "training": {
+              "epochs": 50
+            }
+          },
+          "knobs": [
+            "training.epochs"
+          ],
+          "rationale": "The model is underfitting: train accuracy (0.65) is low and close to validation accuracy (0.629), indicating insufficient learning rather than overfitting. Extending training time should allow the network to better fit the data. No other changes have been tried yet.",
+          "quality": "ok",
+          "seconds": 9.3
+        },
+        {
+          "trial": 7,
+          "action": "train",
+          "updated_params": {
+            "training": {
+              "early_stop_patience": 5,
+              "epochs": 50
+            }
+          },
+          "knobs": [
+            "training.early_stop_patience",
+            "training.epochs"
+          ],
+          "rationale": "The model shows underfitting: train accuracy (0.65) is only slightly below validation accuracy (0.629), indicating insufficient learning rather than overfitting. Extending training time gives the optimizer more opportunity to fit the data. We therefore increase the number of epochs from 25 to 50, while enabling early stopping with a patience of 5 to avoid unnecessary over\u2011training.",
+          "quality": "ok",
+          "seconds": 11.9
+        },
+        {
+          "trial": 8,
+          "action": "train",
+          "updated_params": {
+            "training": {
+              "epochs": 50,
+              "learning_rate": 0.001
+            }
+          },
+          "knobs": [
+            "training.epochs",
+            "training.learning_rate"
+          ],
+          "rationale": "Training accuracy (0.65) is close to validation accuracy (0.629) indicating the model is underfitting rather than overfitting. The low train accuracy after 25 epochs suggests insufficient optimization. Increasing the learning rate and allowing more epochs should help the optimizer converge to a better solution without altering model capacity.",
+          "quality": "ok",
+          "seconds": 14.3
+        },
+        {
+          "trial": 9,
+          "action": "train",
+          "updated_params": {
+            "training": {
+              "early_stop_patience": 5,
+              "epochs": 50
+            }
+          },
+          "knobs": [
+            "training.early_stop_patience",
+            "training.epochs"
+          ],
+          "rationale": "The model shows a small train\u2011validation gap (train accuracy 0.65 vs validation 0.629) indicating under\u2011fitting rather than over\u2011fitting. The low accuracy despite a low final loss suggests the network has not fully converged within the allocated 25 epochs. Extending training should allow the optimizer to improve representation learning and boost both train and validation performance, especially for the weaker class 'cdm'.",
+          "quality": "ok",
+          "seconds": 11.7
+        },
+        {
+          "trial": 10,
+          "action": "train",
+          "updated_params": {
+            "training": {
+              "epochs": 50
+            }
+          },
+          "knobs": [
+            "training.epochs"
+          ],
+          "rationale": "The model shows low train accuracy (0.65) and validation accuracy (0.629), with only a 0.02 gap, indicating underfitting rather than overfitting. Extending training duration gives the optimizer more opportunity to improve both training and validation performance. No other changes are needed yet.",
+          "quality": "ok",
+          "seconds": 14.4
+        },
+        {
+          "trial": 11,
+          "action": "train",
+          "updated_params": {
+            "training": {
+              "epochs": 50
+            }
+          },
+          "knobs": [
+            "training.epochs"
+          ],
+          "rationale": "Both training (0.65) and validation (0.629) accuracies are low and close, indicating underfitting rather than overfitting. The model has not learned the data sufficiently within 25 epochs at a modest learning rate (0.0003). Extending training duration gives the optimizer more steps to converge without altering model capacity. This is the smallest intervention targeting the observed underfitting.",
+          "quality": "ok",
+          "seconds": 11.5
+        },
+        {
+          "trial": 12,
+          "action": "train",
+          "updated_params": {
+            "training": {
+              "early_stop_patience": 5,
+              "epochs": 50,
+              "learning_rate": 0.001
+            }
+          },
+          "knobs": [
+            "training.early_stop_patience",
+            "training.epochs",
+            "training.learning_rate"
+          ],
+          "rationale": "The model shows a small train\u2011validation gap (train_accuracy\u202f0.65 vs validation\u202f0.629) indicating underfitting rather than overfitting. Accuracy is modest for all classes and loss is already low, suggesting the network has not been given enough optimization steps. Extending training and using a slightly higher learning rate should allow the model to better fit the data without risking overfit.",
+          "quality": "ok",
+          "seconds": 5.2
+        },
+        {
+          "trial": 13,
+          "action": "train",
+          "updated_params": {
+            "training": {
+              "early_stop_patience": 5,
+              "epochs": 50
+            }
+          },
+          "knobs": [
+            "training.early_stop_patience",
+            "training.epochs"
+          ],
+          "rationale": "The model is underfitting: train accuracy (0.65) is close to validation accuracy (0.629) and both are low, indicating insufficient learning rather than overfitting. The current schedule runs only 25 epochs, which may be too short for the network to converge. Extending training to 50 epochs (with early stopping patience of 5) gives the model more opportunity to improve without altering architecture.",
+          "quality": "ok",
+          "seconds": 12.7
+        },
+        {
+          "trial": 14,
+          "action": "train",
+          "updated_params": {
+            "training": {
+              "early_stop_patience": 5,
+              "epochs": 50
+            }
+          },
+          "knobs": [
+            "training.early_stop_patience",
+            "training.epochs"
+          ],
+          "rationale": "The model shows a small train-validation gap (train_accuracy 0.65 vs validation 0.629) indicating underfitting rather than overfitting. Accuracy is modest and loss is already low, suggesting the network has not been trained long enough. Extending training epochs will give the optimizer more iterations to improve both train and validation performance. Early stopping with a modest patience is added to guard against future overfit if it occurs.",
+          "quality": "ok",
+          "seconds": 12.7
+        },
+        {
+          "trial": 15,
+          "action": "train",
+          "updated_params": {
+            "training": {
+              "epochs": 50
+            }
+          },
+          "knobs": [
+            "training.epochs"
+          ],
+          "rationale": "Train accuracy (0.65) is only slightly higher than validation accuracy (0.629) indicating the model is underfitting rather than overfitting. The model has not yet fully learned the data, likely due to insufficient training time (25 epochs). Extending the number of epochs to give the optimizer more iterations should improve both training and validation performance without altering the architecture.",
+          "quality": "ok",
+          "seconds": 9.3
+        },
+        {
+          "trial": 16,
+          "action": "train",
+          "updated_params": {
+            "training": {
+              "epochs": 50
+            }
+          },
+          "knobs": [
+            "training.epochs"
+          ],
+          "rationale": "The model shows a small train\u2011validation gap (train_accuracy\u202f0.65 vs validation\u202f0.629) indicating underfitting rather than overfitting. Training stopped after only 25 epochs, yet loss is still relatively low (0.0616) and accuracy has not saturated. Extending training should allow the network to better fit the data and improve both train and validation performance.",
+          "quality": "ok",
+          "seconds": 13.5
+        },
+        {
+          "trial": 17,
+          "action": "train",
+          "updated_params": {
+            "training": {
+              "early_stop_patience": 5,
+              "epochs": 50
+            }
+          },
+          "knobs": [
+            "training.early_stop_patience",
+            "training.epochs"
+          ],
+          "rationale": "Train accuracy (0.65) is close to validation accuracy (0.629) indicating underfitting rather than overfitting. The model has not fully learned the data within the 25 epochs. Extending training should allow the optimizer to converge to higher accuracy. No large train\u2011validation gap suggests regularization changes are unnecessary at this point.",
+          "quality": "ok",
+          "seconds": 5.6
+        },
+        {
+          "trial": 18,
+          "action": "train",
+          "updated_params": {
+            "training": {
+              "early_stop_patience": 5,
+              "epochs": 50
+            }
+          },
+          "knobs": [
+            "training.early_stop_patience",
+            "training.epochs"
+          ],
+          "rationale": "The model is underfitting: train accuracy (0.65) and validation accuracy (0.629) are both low and close, indicating insufficient learning rather than overfitting. Extending training time should allow the network to converge to a better solution. No overfitting signs suggest we keep the architecture unchanged and simply increase the number of epochs.",
+          "quality": "ok",
+          "seconds": 11.4
+        },
+        {
+          "trial": 19,
+          "action": "train",
+          "updated_params": {
+            "training": {
+              "augment": true
+            }
+          },
+          "knobs": [
+            "training.augment"
+          ],
+          "rationale": "The model shows a small train\u2011validation gap (train accuracy 0.65 vs validation 0.629) indicating limited overfitting but overall low performance. Training loss is already low (0.0616), suggesting the optimizer is not extracting more signal. Adding data augmentation can provide more varied inputs, helping the network learn more robust features and potentially raise both train and validation accuracy. This is the minimal intervention before changing model capacity.",
+          "quality": "harmful",
+          "seconds": 15.3
+        },
+        {
+          "trial": 20,
+          "action": "train",
+          "updated_params": {
+            "training": {
+              "augment": true,
+              "early_stop_patience": 5
+            }
+          },
+          "knobs": [
+            "training.augment",
+            "training.early_stop_patience"
+          ],
+          "rationale": "Training accuracy (0.65) is close to validation accuracy (0.629) indicating a small generalization gap, but both are modest, suggesting underfitting. The model may benefit from more diverse training data. Enabling data augmentation should provide additional variability and help improve both train and validation performance without altering the architecture.",
+          "quality": "harmful",
+          "seconds": 10.4
+        }
+      ],
+      "summary": {
+        "n": 20,
+        "actions": {
+          "train": 20
+        },
+        "knob_sets": {
+          "training.early_stop_patience,training.epochs": 9,
+          "training.epochs": 7,
+          "training.epochs,training.learning_rate": 1,
+          "training.early_stop_patience,training.epochs,training.learning_rate": 1,
+          "training.augment": 1,
+          "training.augment,training.early_stop_patience": 1
+        },
+        "quality": {
+          "ok": 18,
+          "harmful": 2
+        },
+        "action_entropy_bits": -0.0,
+        "knobset_entropy_bits": 1.913,
+        "modal_knob_set": [
+          "training.early_stop_patience,training.epochs",
+          9
+        ]
+      }
+    }
+  },
+  "finished_utc": "2026-09-28T23:33:30Z"
+}

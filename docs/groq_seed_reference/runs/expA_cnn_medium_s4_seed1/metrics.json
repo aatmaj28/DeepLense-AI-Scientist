@@ -1,0 +1,275 @@
+{
+  "tuning_seconds": 1285.1,
+  "iterations": 3,
+  "best_iteration": 2,
+  "val_accuracy": 0.8672222222222222,
+  "val_macro_auc": 0.9646351851851852,
+  "train_accuracy": 0.8967,
+  "gap": 0.029477777777777825,
+  "stop_reason": "[loop guard] train/val gap 0.029 <= threshold 0.06 \u2014 gap closed.",
+  "trajectory": [
+    {
+      "iteration": 0,
+      "architecture": {
+        "name": "cnn_medium_s4",
+        "family": "cnn",
+        "input_shape": [
+          150,
+          150
+        ],
+        "channels": 1,
+        "num_classes": 3,
+        "depths": [
+          2,
+          3,
+          3,
+          4
+        ],
+        "widths": [
+          32,
+          64,
+          128,
+          256
+        ],
+        "physics_informed": false,
+        "rationale": ""
+      },
+      "training_config": {
+        "loss": "cross_entropy",
+        "optimizer": "adamw",
+        "learning_rate": 0.0003,
+        "batch_size": 32,
+        "epochs": 25,
+        "weight_decay": 0.0001,
+        "lr_scheduler": "cosine",
+        "dropout": 0.0,
+        "augment": false,
+        "early_stop_patience": 0
+      },
+      "train_accuracy": 1.0,
+      "val_accuracy": 0.8166666666666667,
+      "gap": 0.18333333333333335,
+      "val_macro_auc": 0.9408541666666667,
+      "confusion_matrix": [
+        [
+          552,
+          41,
+          7
+        ],
+        [
+          33,
+          485,
+          82
+        ],
+        [
+          6,
+          161,
+          433
+        ]
+      ],
+      "weights_path": "/Users/aj/GSoC/deeplense_artifacts/groq_gpt-oss-120b_seeded_2026-09-28/experiment_a/expA_cnn_medium_s4_seed1/_train_runs/4f20594c/model.pt",
+      "planner_action": "train",
+      "planner_reasoning": "The model achieves perfect training accuracy (1.0) but validation accuracy is only 0.817, indicating significant overfitting. Adding regularization should close the generalization gap. A modest dropout (0.2) and enabling data augmentation are the smallest changes likely to improve validation performance without altering the architecture.",
+      "planner_updated_params": {
+        "training": {
+          "augment": true,
+          "dropout": 0.2
+        }
+      }
+    },
+    {
+      "iteration": 1,
+      "architecture": {
+        "name": "cnn_medium_s4",
+        "family": "cnn",
+        "input_shape": [
+          150,
+          150
+        ],
+        "channels": 1,
+        "num_classes": 3,
+        "depths": [
+          2,
+          3,
+          3,
+          4
+        ],
+        "widths": [
+          32,
+          64,
+          128,
+          256
+        ],
+        "physics_informed": false,
+        "rationale": ""
+      },
+      "training_config": {
+        "loss": "cross_entropy",
+        "optimizer": "adamw",
+        "learning_rate": 0.0003,
+        "batch_size": 32,
+        "epochs": 25,
+        "weight_decay": 0.0001,
+        "lr_scheduler": "cosine",
+        "dropout": 0.2,
+        "augment": true,
+        "early_stop_patience": 0
+      },
+      "train_accuracy": 0.8756,
+      "val_accuracy": 0.7127777777777777,
+      "gap": 0.1628222222222223,
+      "val_macro_auc": 0.9466342592592593,
+      "confusion_matrix": [
+        [
+          306,
+          285,
+          9
+        ],
+        [
+          0,
+          556,
+          44
+        ],
+        [
+          0,
+          179,
+          421
+        ]
+      ],
+      "weights_path": "/Users/aj/GSoC/deeplense_artifacts/groq_gpt-oss-120b_seeded_2026-09-28/experiment_a/expA_cnn_medium_s4_seed1/_train_runs/7d1ac6b0/model.pt",
+      "planner_action": "train",
+      "planner_reasoning": "After adding dropout=0.2 and augmentation, training accuracy fell to 0.876 and validation accuracy dropped to 0.713, indicating the model is now underfitting (train accuracy far from perfect) and regularization may be too strong. The biggest gap is between train and validation (0.163) and recall for class 'no_sub' is only 0.51. Reducing dropout to 0.1 should restore some capacity while keeping augmentation to preserve data diversity, aiming to raise both train and validation performance.",
+      "planner_updated_params": {
+        "training": {
+          "dropout": 0.1
+        }
+      }
+    },
+    {
+      "iteration": 2,
+      "architecture": {
+        "name": "cnn_medium_s4",
+        "family": "cnn",
+        "input_shape": [
+          150,
+          150
+        ],
+        "channels": 1,
+        "num_classes": 3,
+        "depths": [
+          2,
+          3,
+          3,
+          4
+        ],
+        "widths": [
+          32,
+          64,
+          128,
+          256
+        ],
+        "physics_informed": false,
+        "rationale": ""
+      },
+      "training_config": {
+        "loss": "cross_entropy",
+        "optimizer": "adamw",
+        "learning_rate": 0.0003,
+        "batch_size": 32,
+        "epochs": 25,
+        "weight_decay": 0.0001,
+        "lr_scheduler": "cosine",
+        "dropout": 0.1,
+        "augment": true,
+        "early_stop_patience": 0
+      },
+      "train_accuracy": 0.8967,
+      "val_accuracy": 0.8672222222222222,
+      "gap": 0.029477777777777825,
+      "val_macro_auc": 0.9646351851851852,
+      "confusion_matrix": [
+        [
+          578,
+          22,
+          0
+        ],
+        [
+          8,
+          517,
+          75
+        ],
+        [
+          1,
+          133,
+          466
+        ]
+      ],
+      "weights_path": "/Users/aj/GSoC/deeplense_artifacts/groq_gpt-oss-120b_seeded_2026-09-28/experiment_a/expA_cnn_medium_s4_seed1/_train_runs/a94be28c/model.pt",
+      "planner_action": "report",
+      "planner_reasoning": "[loop guard] train/val gap 0.029 <= threshold 0.06 \u2014 gap closed.",
+      "planner_updated_params": {}
+    }
+  ],
+  "test": {
+    "n_test": 1800,
+    "test_accuracy": 0.8611111111111112,
+    "test_macro_auc": 0.9588444444444445,
+    "per_class": {
+      "no_sub": {
+        "precision": 0.9881,
+        "recall": 0.9683,
+        "f1": 0.9781,
+        "support": 600.0
+      },
+      "cdm": {
+        "precision": 0.7635,
+        "recall": 0.85,
+        "f1": 0.8044,
+        "support": 600.0
+      },
+      "axion": {
+        "precision": 0.8438,
+        "recall": 0.765,
+        "f1": 0.8024,
+        "support": 600.0
+      }
+    },
+    "confusion_matrix": [
+      [
+        581,
+        18,
+        1
+      ],
+      [
+        6,
+        510,
+        84
+      ],
+      [
+        1,
+        140,
+        459
+      ]
+    ]
+  },
+  "checkpoints": [
+    {
+      "run_id": "4f20594c",
+      "file": "checkpoints/4f20594c.pt",
+      "bytes": 10187621
+    },
+    {
+      "run_id": "7d1ac6b0",
+      "file": "checkpoints/7d1ac6b0.pt",
+      "bytes": 10187621
+    },
+    {
+      "run_id": "a94be28c",
+      "file": "checkpoints/a94be28c.pt",
+      "bytes": 10187621
+    }
+  ],
+  "run_id": "expA_cnn_medium_s4_seed1",
+  "architecture": "cnn_medium_s4",
+  "seed": 1
+}
