@@ -1,0 +1,52 @@
+effective LLM: OpenAIModel model_name=openai/gpt-oss-120b base_url=https://api.groq.com/openai/v1/
+
+===== UNDERFIT =====
+  CONSTRUCTED PROBE — val/AUC/confusion verbatim from ai_scientist_run tuning iteration 0; train set to 0.6500 so train and val are both low with no gap
+  train 0.6500 / val 0.6294 / gap 0.0206 / macro_auc 0.8068
+  expected: add capacity or training (more epochs / larger model / higher LR); adding regularization would be harmful
+   trial  1: train         training.early_stop_patience,training.epochs   [ok]
+   trial  2: train         training.epochs                                [ok]
+   trial  3: train         training.early_stop_patience,training.epochs   [ok]
+   trial  4: train         training.epochs                                [ok]
+   trial  5: train         training.early_stop_patience,training.epochs   [ok]
+[llm retry] HTTP 429 from api.groq.com: attempt 1/6 failed, retrying in 8.0s
+   trial  6: train         training.epochs                                [ok]
+[llm retry] HTTP 429 from api.groq.com: attempt 1/6 failed, retrying in 10.0s
+   trial  7: train         training.early_stop_patience,training.epochs   [ok]
+[llm retry] HTTP 429 from api.groq.com: attempt 1/6 failed, retrying in 12.0s
+[llm retry] HTTP 429 from api.groq.com: attempt 2/6 failed, retrying in 1.0s
+   trial  8: train         training.epochs,training.learning_rate         [ok]
+[llm retry] HTTP 429 from api.groq.com: attempt 1/6 failed, retrying in 10.0s
+   trial  9: train         training.early_stop_patience,training.epochs   [ok]
+[llm retry] HTTP 429 from api.groq.com: attempt 1/6 failed, retrying in 12.0s
+[llm retry] HTTP 429 from api.groq.com: attempt 2/6 failed, retrying in 1.0s
+   trial 10: train         training.epochs                                [ok]
+[llm retry] HTTP 429 from api.groq.com: attempt 1/6 failed, retrying in 10.0s
+   trial 11: train         training.epochs                                [ok]
+[llm retry] HTTP 429 from api.groq.com: attempt 1/6 failed, retrying in 4.0s
+   trial 12: train         training.early_stop_patience,training.epochs,training.learning_rate [ok]
+[llm retry] HTTP 429 from api.groq.com: attempt 1/6 failed, retrying in 11.0s
+   trial 13: train         training.early_stop_patience,training.epochs   [ok]
+[llm retry] HTTP 429 from api.groq.com: attempt 1/6 failed, retrying in 11.0s
+   trial 14: train         training.early_stop_patience,training.epochs   [ok]
+[llm retry] HTTP 429 from api.groq.com: attempt 1/6 failed, retrying in 8.0s
+   trial 15: train         training.epochs                                [ok]
+[llm retry] HTTP 429 from api.groq.com: attempt 1/6 failed, retrying in 10.0s
+[llm retry] HTTP 429 from api.groq.com: attempt 2/6 failed, retrying in 1.0s
+   trial 16: train         training.epochs                                [ok]
+[llm retry] HTTP 429 from api.groq.com: attempt 1/6 failed, retrying in 3.0s
+[llm retry] HTTP 429 from api.groq.com: attempt 2/6 failed, retrying in 1.0s
+   trial 17: train         training.early_stop_patience,training.epochs   [ok]
+[llm retry] HTTP 429 from api.groq.com: attempt 1/6 failed, retrying in 10.0s
+   trial 18: train         training.early_stop_patience,training.epochs   [ok]
+[llm retry] HTTP 429 from api.groq.com: attempt 1/6 failed, retrying in 14.0s
+   trial 19: train         training.augment                               [harmful]
+[llm retry] HTTP 429 from api.groq.com: attempt 1/6 failed, retrying in 9.0s
+   trial 20: train         training.augment,training.early_stop_patience  [harmful]
+  -> actions {'train': 20}
+  -> knob sets {'training.early_stop_patience,training.epochs': 9, 'training.epochs': 7, 'training.epochs,training.learning_rate': 1, 'training.early_stop_patience,training.epochs,training.learning_rate': 1, 'training.augment': 1, 'training.augment,training.early_stop_patience': 1}
+  -> quality {'ok': 18, 'harmful': 2}
+  -> entropy: action -0.0 bits, knob-set 1.913 bits
+
+artifacts -> docs/groq_seed_reference/e1_underfit_gpt-oss-120b.json
+exit=0

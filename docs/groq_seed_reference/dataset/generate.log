@@ -1,0 +1,15 @@
+generating 10800 images in 6 jobs, 4 at a time -> /Users/aj/GSoC/deeplense_data/seeded_2026-09-28
+  [test/no_sub seed=2001] rc=0 files=600/600 attempts=600 299.5s
+  [test/cdm seed=2002] rc=0 files=600/600 attempts=600 335.6s
+  [test/axion seed=2003] rc=0 files=600/600 attempts=600 370.8s
+  [pool/no_sub seed=1001] rc=0 files=3000/3000 attempts=3000 1581.6s
+  [pool/cdm seed=1002] rc=0 files=3000/3000 attempts=3000 1594.4s
+  [pool/axion seed=1003] rc=0 files=3000/3000 attempts=3000 1619.6s
+manifest: 10800 files | test-pool hash overlap 0 | duplicates within pool 0, within test 0
+no_sub: 2400 train / 600 val
+cdm: 2400 train / 600 val
+axion: 2400 train / 600 val
+done -> /Users/aj/GSoC/deeplense_data/seeded_2026-09-28/model1/train  /Users/aj/GSoC/deeplense_data/seeded_2026-09-28/model1/val
+{"model1/train": 7200, "model1/val": 1800, "model1/train_small": 1800, "model1_test": 1800} 
+done in 1619.6s -> /Users/aj/GSoC/deeplense_data/seeded_2026-09-28
+exit=0

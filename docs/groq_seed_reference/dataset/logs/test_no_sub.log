@@ -1,0 +1,15 @@
+/opt/pyHalo/pyHalo/defaults.py:156: SyntaxWarning: "is not" with a literal. Did you mean "!="?
+  if 'log_mc' is not None:
+[no_sub] 50/600  (2.23 img/s)
+[no_sub] 100/600  (2.34 img/s)
+[no_sub] 150/600  (2.30 img/s)
+[no_sub] 200/600  (2.26 img/s)
+[no_sub] 250/600  (2.19 img/s)
+[no_sub] 300/600  (2.15 img/s)
+[no_sub] 350/600  (2.12 img/s)
+[no_sub] 400/600  (2.11 img/s)
+[no_sub] 450/600  (2.02 img/s)
+[no_sub] 500/600  (2.02 img/s)
+[no_sub] 550/600  (2.01 img/s)
+[no_sub] 600/600  (2.01 img/s)
+[no_sub] DONE 600/600 in 298s (600 attempts)
