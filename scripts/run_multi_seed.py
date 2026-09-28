@@ -197,6 +197,12 @@ def collect_checkpoints(run_dir: str, backend_root: str) -> list[dict]:
     return out
 
 
+def llm_banner(llm) -> str:
+    """The effective LLM as built; echoed at the start of every run's own log."""
+    return (f"effective LLM   : {type(llm).__name__} model_name="
+            f"{getattr(llm, 'model_name', '?')}  (DLENS_LLM={os.getenv('DLENS_LLM')})")
+
+
 def environment_info(llm_id: str) -> dict:
     import torch
     try:
@@ -320,6 +326,7 @@ async def experiment_a(args, classes, train_ref, val_ref, llm, llm_id, art_root)
             os.makedirs(run_dir, exist_ok=True)
             print(f"\n--- {run_id} ---", flush=True)
             with tee_stdout(os.path.join(run_dir, "train_log.txt")):
+                print(f"    {llm_banner(llm)}", flush=True)
                 write_json(os.path.join(run_dir, "config.json"), {
                     "experiment": "A", "run_id": run_id, "seed": seed,
                     "architecture": arch.model_dump(mode="json"),
@@ -366,6 +373,7 @@ async def experiment_b(args, classes, train_ref, val_ref, llm, llm_id, art_root)
         search_root = os.path.join(run_dir, "_search_runs")
         print(f"\n--- {run_id} ---", flush=True)
         with tee_stdout(os.path.join(run_dir, "train_log.txt")):
+            print(f"    {llm_banner(llm)}", flush=True)
             write_json(os.path.join(run_dir, "config.json"), {
                 "experiment": "B", "run_id": run_id, "seed": seed,
                 "protocol": {"num_candidates": args.num_candidates, "top_k": args.top_k,
@@ -499,7 +507,8 @@ async def main() -> int:
     val_ref = dataset_ref(os.path.join(args.data_root, args.val_dir), classes)
 
     llm = build_llm()  # DLENS_LLM
-    llm_id = os.getenv("DLENS_LLM") or DEFAULT_LLM
+    # Record the model actually built, not just the env var that selected it.
+    llm_id = getattr(llm, "model_name", None) or os.getenv("DLENS_LLM") or DEFAULT_LLM
     import torch
 
     art_root = os.path.expanduser(args.artifact_root)
@@ -509,8 +518,7 @@ async def main() -> int:
 
     print(RULE)
     print("  MULTI-SEED REPLICATION — full dataset, held-out test once per model")
-    print(f"  effective LLM   : {type(llm).__name__} model_name="
-          f"{getattr(llm, 'model_name', '?')}  (DLENS_LLM={os.getenv('DLENS_LLM')})")
+    print(f"  {llm_banner(llm)}")
     print(f"  data            : {train_ref.num_samples} train / {val_ref.num_samples} val "
           f"| {train_ref.image_shape}px | classes={classes}")
     print(f"  torch           : {torch.__version__} | device="

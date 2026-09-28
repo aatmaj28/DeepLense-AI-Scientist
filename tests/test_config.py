@@ -3,8 +3,16 @@
 from __future__ import annotations
 
 import pytest
+from pydantic_ai.models.google import GoogleModel
+from pydantic_ai.models.openai import OpenAIChatModel
 
-from dlens.config import DEFAULT_MODEL, DEFAULT_PROVIDER, ModelSettings, build_model_from_env
+from dlens.config import (
+    DEFAULT_MODEL,
+    DEFAULT_PROVIDER,
+    ModelSettings,
+    build_llm,
+    build_model_from_env,
+)
 
 
 def _clear(monkeypatch):
@@ -71,3 +79,18 @@ def test_openai_provider_defaults_to_gpt_4o_mini(monkeypatch):
     assert s.model == "gpt-4o-mini"  # provider-specific default, not the ollama tag
     assert s.api_key == "sk-test"
     build_model_from_env()  # constructs without a network call
+
+
+def test_build_llm_routes_gemini_ids_to_google(monkeypatch):
+    monkeypatch.delenv("GOOGLE_API_KEY", raising=False)
+    monkeypatch.setenv("GEMINI_API_KEY", "test-key")
+    model = build_llm("gemini-2.5-flash")
+    assert isinstance(model, GoogleModel)
+    assert model.model_name == "gemini-2.5-flash"  # constructs without a network call
+
+
+def test_build_llm_keeps_other_ids_on_openai(monkeypatch):
+    monkeypatch.setenv("OPENAI_API_KEY", "sk-test")
+    model = build_llm("gpt-5.2")
+    assert isinstance(model, OpenAIChatModel) and not isinstance(model, GoogleModel)
+    assert model.model_name == "gpt-5.2"

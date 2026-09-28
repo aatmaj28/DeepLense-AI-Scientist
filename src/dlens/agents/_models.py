@@ -1,5 +1,7 @@
 from __future__ import annotations
+from pydantic_ai.models.google import GoogleModel
 from pydantic_ai.models.openai import OpenAIChatModel
+from pydantic_ai.providers.google import GoogleProvider
 from pydantic_ai.providers.ollama import OllamaProvider
 from pydantic_ai.providers.openai import OpenAIProvider
 from pydantic_ai.providers.litellm import LiteLLMProvider
@@ -10,6 +12,14 @@ from pydantic_ai.providers.litellm import LiteLLMProvider
 class OpenAIModel(OpenAIChatModel):
     def __init__(self, model_name: str = "gpt-4o-mini"):
         super().__init__(model_name=model_name)
+
+
+# Wrapper for Google Gemini (Gemini API, native pydantic-ai provider). The key is
+# read from GOOGLE_API_KEY, then GEMINI_API_KEY, unless passed explicitly.
+# Structured output is not yet verified against a live model: docs/KNOWN_ISSUES.md §3.
+class GeminiModel(GoogleModel):
+    def __init__(self, model_name: str = "gemini-2.5-flash", api_key: str | None = None):
+        super().__init__(model_name=model_name, provider=GoogleProvider(api_key=api_key))
 
 
 # Wrapper for Ollama model
