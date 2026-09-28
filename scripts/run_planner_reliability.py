@@ -181,15 +181,21 @@ async def main() -> int:
     args = p.parse_args()
 
     from dlens.agents._experiment_planner import ExperimentPlanner
-    from dlens.agents._models import OpenAIModel
+    from dlens.config import build_llm
     from dlens.schemas._experiment import ExperimentState
 
     os.makedirs(os.path.dirname(args.out) or ".", exist_ok=True)
     states = build_states()
     wanted = [s.strip() for s in args.states.split(",") if s.strip()]
-    planner = ExperimentPlanner(model=OpenAIModel(model_name=args.model))
+    # build_llm gives the same OpenAIChatModel for OpenAI ids, and also reaches
+    # other providers (e.g. groq:<id>). Record what was actually built.
+    llm = build_llm(args.model)
+    planner = ExperimentPlanner(model=llm)
+    print(f"effective LLM: {type(llm).__name__} model_name={llm.model_name} "
+          f"base_url={getattr(llm, 'base_url', '?')}", flush=True)
 
-    out = {"model": args.model, "trials": args.trials,
+    out = {"model": args.model, "llm_model_name": llm.model_name,
+           "llm_base_url": str(getattr(llm, "base_url", None)), "trials": args.trials,
            "started_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "states": {}}
 
     for name in wanted:
