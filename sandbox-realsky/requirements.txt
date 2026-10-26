@@ -1,0 +1,19 @@
+# Pinned versions verified against every lenstronomy/pyHalo call RealSky makes.
+lenstronomy==1.13.6
+pyHalo==1.4.1
+# pyHalo imports these but does not declare them.
+colossus==1.4.0
+mcfit==0.0.22
+# Normalizing flows RealSky samples from (torch is installed CPU-only, separately).
+nflows==0.14
+# The rest of RealSky's requirements.txt.
+numpy
+scipy
+astropy
+matplotlib
+tqdm
+h5py
+pandas
+pyyaml
+scikit-learn
+seaborn
