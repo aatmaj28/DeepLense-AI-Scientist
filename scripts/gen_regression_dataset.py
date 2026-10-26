@@ -47,9 +47,21 @@ BENCH_SEED = 9101
 # The sampling distributions in scripts/lens_regression_sim.py, for the uniformity checks.
 UNIFORM_COLUMNS = {"theta_E": (0.5, 2.5), "center_x": (-0.3, 0.3), "center_y": (-0.3, 0.3),
                    "q": (0.6, 1.0), "phi": (0.0, math.pi), "src_R_sersic": (0.1, 0.5),
-                   "src_n_sersic": (0.5, 2.5), "src_amp": (10.0, 40.0)}
-REPORT_COLUMNS = (*TARGETS, "q", "phi", "src_R_sersic", "src_n_sersic", "src_amp",
-                  "exposure_time", "peak_snr")
+                   "src_n_sersic": (0.5, 2.5)}
+LOG_UNIFORM_COLUMNS = {"src_peak_sb": (90.0, 450.0)}
+REPORT_COLUMNS = (*TARGETS, "q", "phi", "src_R_sersic", "src_n_sersic", "src_peak_sb", "src_amp",
+                  "exposure_time", "peak_snr", "snr_measured")
+SNR_BAND = (14.0, 60.0)  # the validator's default band (tools/_param_validator.py)
+N_BINS = ((0.5, 1.0), (1.0, 1.5), (1.5, 2.0), (2.0, 2.5))
+
+
+def spearman(a, b) -> float:
+    rank = lambda v: np.argsort(np.argsort(v))  # noqa: E731
+    return float(np.corrcoef(rank(np.asarray(a)), rank(np.asarray(b)))[0, 1])
+
+
+def n_bin(n: np.ndarray, lo: float, hi: float) -> np.ndarray:
+    return (n >= lo) & ((n < hi) if hi < N_BINS[-1][1] else (n <= hi))
 
 
 def docker(args: list[str], mounts: dict[str, str], cpus: int = 1) -> list[str]:
@@ -95,17 +107,18 @@ def check_transforms() -> dict:
 
 
 def validate_rows(rows: list[dict]) -> dict:
-    """Run every sampled system through the two-stage path's physical validator.
+    """Run every sampled system through the two-stage path's physical validator, SNR check on.
 
-    Its SNR estimate is calibrated for n_sersic ~ 1 sources, and these vary n, so the SNR
-    check is turned off here; the measured peak SNR is reported separately instead.
+    Also compares its SNR estimate with each image's measured SNR, by Sersic index: the
+    estimate scales amp (the brightness at R_sersic) by a constant calibrated on n = 1.
     """
     from dlens.schemas._lens_params import LensParameterSet
     from dlens.tools._param_validator import ValidationRanges, validate_parameters
 
-    ranges = ValidationRanges(snr_min=0.0, snr_max=float("inf"))
+    ranges = ValidationRanges()
     failed: dict[str, int] = {}
     passed = 0
+    estimates = []
     for r in rows:
         params = LensParameterSet(
             z_lens=0.5, z_source=1.0, lens_model_list=["SIE"],
@@ -118,11 +131,23 @@ def validate_rows(rows: list[dict]) -> dict:
             kwargs_psf={"psf_type": "GAUSSIAN", "fwhm": 0.087, "pixel_size": 0.05})
         res = validate_parameters(params, ranges)
         passed += res.passed
+        estimates.append(res.snr_estimate)
         for name, ok in res.checks.items():
             if not ok:
                 failed[name] = failed.get(name, 0) + 1
+    est = np.array(estimates, dtype=float)
+    meas = np.array([r["snr_measured"] for r in rows])
+    n = np.array([r["src_n_sersic"] for r in rows])
+    by_n = {}
+    for lo, hi in N_BINS:
+        sel = n_bin(n, lo, hi)
+        by_n[f"{lo}-{hi}"] = {"systems": int(sel.sum()),
+                              "snr_check_failed": int(((est[sel] < ranges.snr_min) | (est[sel] > ranges.snr_max)).sum()),
+                              "median_estimate": float(np.median(est[sel])),
+                              "median_measured": float(np.median(meas[sel]))}
     return {"systems": len(rows), "passed": passed, "failed_checks": failed,
-            "note": "SNR check disabled (estimator calibrated for n_sersic ~ 1); see peak_snr"}
+            "snr_band": [ranges.snr_min, ranges.snr_max], "snr_estimate": column_stats(est),
+            "snr_check_by_n_sersic": by_n}
 
 
 def split_stats(rows: list[dict]) -> dict:
@@ -130,14 +155,29 @@ def split_stats(rows: list[dict]) -> dict:
     for col in REPORT_COLUMNS:
         values = np.array([r[col] for r in rows])
         entry = column_stats(np.log10(values) if col == "exposure_time" else values,
-                             value_range=UNIFORM_COLUMNS.get(col))
+                             value_range=UNIFORM_COLUMNS.get(col) or LOG_UNIFORM_COLUMNS.get(col))
         if col == "exposure_time":
             entry["note"] = "log10 seconds"
         if col in UNIFORM_COLUMNS:
             lo, hi = UNIFORM_COLUMNS[col]
             entry["ks_uniform_D"], entry["ks_uniform_p"] = ks_uniform(values, lo, hi)
             entry["in_range"] = bool(values.min() >= lo and values.max() <= hi)
+        if col in LOG_UNIFORM_COLUMNS:
+            lo, hi = LOG_UNIFORM_COLUMNS[col]
+            entry["ks_uniform_D"], entry["ks_uniform_p"] = ks_uniform(np.log(values), math.log(lo), math.log(hi))
+            entry["ks_note"] = "uniformity of log(value)"
+            entry["in_range"] = bool(values.min() >= lo and values.max() <= hi)
         stats[col] = entry
+    for col in ("snr_measured", "peak_snr"):
+        v = stats[col]
+        values = np.array([r[col] for r in rows])
+        v["in_band"] = float(np.mean((values >= SNR_BAND[0]) & (values <= SNR_BAND[1])))
+        v["below_band"] = int((values < SNR_BAND[0]).sum())
+        v["above_band"] = int((values > SNR_BAND[1]).sum())
+        v["spearman"] = {c: spearman(values, [r[c] for r in rows])
+                         for c in ("theta_E", "q", "src_n_sersic", "src_R_sersic", "exposure_time")}
+        n = np.array([r["src_n_sersic"] for r in rows])
+        v["median_by_n_sersic"] = {f"{lo}-{hi}": float(np.median(values[n_bin(n, lo, hi)])) for lo, hi in N_BINS}
     t = np.array([[r[c] for c in TARGETS] for r in rows])
     corr = np.corrcoef(t, rowvar=False)
     stats["target_correlation"] = {"columns": list(TARGETS), "matrix": np.round(corr, 3).tolist(),
@@ -158,6 +198,12 @@ def print_stats(name: str, stats: dict) -> None:
         print(f"  {label:15s} {s['min']:8.3f} {s['p5']:8.3f} {s['median']:8.3f} {s['p95']:8.3f} "
               f"{s['max']:8.3f} {s['std']:7.3f} {ks:>14s}  {sparkline(s['hist'])}")
     print(f"  max |correlation| between targets: {stats['target_correlation']['max_abs_offdiag']:.3f}")
+    for col in ("snr_measured", "peak_snr"):
+        s = stats[col]
+        corr = " ".join(f"{c} {v:+.2f}" for c, v in s["spearman"].items())
+        by_n = " ".join(f"{k}: {v:.1f}" for k, v in s["median_by_n_sersic"].items())
+        print(f"  {col}: {s['in_band']:.2%} in {list(SNR_BAND)} ({s['below_band']} below, {s['above_band']} above) | "
+              f"rank corr: {corr}\n    median by n_sersic: {by_n}")
 
 
 def bench(args: argparse.Namespace, out: str) -> int:
@@ -170,9 +216,9 @@ def bench(args: argparse.Namespace, out: str) -> int:
     names = sorted(os.listdir(os.path.join(out, "bench_a")))
     same = all(sha256(os.path.join(out, "bench_a", n)) == sha256(os.path.join(out, "bench_b", n)) for n in names)
     rows = read_labels(os.path.join(out, "bench_a", "labels.csv"))
-    snr = np.array([r["peak_snr"] for r in rows])
+    snr = np.array([r["snr_measured"] for r in rows])
     print(f"\nBENCH {args.bench} images x2 with seed {BENCH_SEED}: byte-identical runs: {same}")
-    print(f"  rate {args.bench / runs[0]['wall_s']:.2f} img/s with {args.workers} workers | peak SNR "
+    print(f"  rate {args.bench / runs[0]['wall_s']:.2f} img/s with {args.workers} workers | measured SNR "
           f"p5 {np.percentile(snr, 5):.1f} median {np.median(snr):.1f} p95 {np.percentile(snr, 95):.1f}")
     return 0 if same else 1
 
@@ -260,8 +306,11 @@ def main() -> int:
 
     # ---- checks + distributions ------------------------------------------------------
     validation = validate_rows(pool_rows + test_rows)
-    print(f"validator: {validation['passed']}/{validation['systems']} pass; failed checks "
+    print(f"validator (SNR check on): {validation['passed']}/{validation['systems']} pass; failed checks "
           f"{validation['failed_checks'] or 'none'}", flush=True)
+    for k, v in validation["snr_check_by_n_sersic"].items():
+        print(f"  n_sersic {k}: SNR check failed {v['snr_check_failed']}/{v['systems']}; median estimate "
+              f"{v['median_estimate']:.1f} vs measured {v['median_measured']:.1f}", flush=True)
     stats = {s: split_stats(rows) for s, (rows, _) in splits.items()}
     json.dump(stats, open(os.path.join(out, "label_stats.json"), "w"), indent=1)
     for s in splits:
@@ -287,9 +336,12 @@ def main() -> int:
         "rules": {"split": f"seeded shuffle (seed {args.split_seed}) of pool rows sorted by file; "
                            f"first {args.val_frac:.0%} to val",
                   "chunks": "250 images per chunk; chunk c drawn from SeedSequence(seed).spawn()[c]"},
-        "peak_snr_definition": "noiseless model peak counts / sqrt(peak counts + (background_rms * exposure)^2); "
-                               "canonical Model_I parameters score median 14.5 (p5 12.6, p95 16.6) on it, "
-                               "vs 18.1 measured on noisy Model_I images by the validator's estimator",
+        "snr_definitions": {
+            "snr_measured": "on the noisy image: (max - mean of the four 10 px corner boxes) / "
+                            "sqrt(max + their variance); reproduces the validator's calibration on 900 real "
+                            "Model_I images (p5/median/p95 14.8/18.0/21.8 vs recorded 14.8/18.1/22.0)",
+            "peak_snr": "noiseless model peak counts / sqrt(peak counts + (background_rms * exposure)^2); "
+                        "canonical Model_I parameters score median 14.5 (p5 12.6, p95 16.6) on it"},
         "label_transform_check": transform_check,
         "validator": validation,
         "hash_check": hash_check,

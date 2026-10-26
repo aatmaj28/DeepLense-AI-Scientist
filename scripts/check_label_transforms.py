@@ -47,7 +47,7 @@ def main() -> int:
     systems = [sim.sample(rng) for _ in range(6)]
     worst, failures, caught = 0.0, [], 0
     for s, system in enumerate(systems):
-        base = sim.image_model(system["kwargs_lens"], system["kwargs_source"], system["exposure_time"])
+        base = sim.render(system)  # sets the source amp, which the re-renders below reuse
         peak = float(np.abs(base).max())
         for fc, fr, k in ll.ALL_TRANSFORMS:
             expected = ll.transform_image(base, fc, fr, k)

@@ -31,14 +31,15 @@ def run_chunk(args: tuple) -> list[dict]:
     rows = []
     for i in range(start, start + n):
         system = sim.sample(rng)
-        model = sim.image_model(system["kwargs_lens"], system["kwargs_source"], system["exposure_time"])
+        model = sim.render(system)
         img = sim.observe(model, system["exposure_time"]).astype(np.float32)
         if img.shape != (sim.NUM_PIX, sim.NUM_PIX) or not np.isfinite(img).all():
             raise RuntimeError(f"bad image at index {i}")
         name = f"{prefix}_{i:05d}.npy"
         np.save(os.path.join(out, name), img)
         rows.append({"file": name, **sim.labels(system),
-                     "peak_snr": sim.peak_snr(model, system["exposure_time"]), "chunk": chunk})
+                     "peak_snr": sim.peak_snr(model, system["exposure_time"]),
+                     "snr_measured": sim.measured_snr(img), "chunk": chunk})
     return rows
 
 
