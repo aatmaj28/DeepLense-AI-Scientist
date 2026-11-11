@@ -29,7 +29,10 @@ RUN pip install --no-cache-dir -r /opt/realsky-env/requirements.txt -c /opt/real
 
 # RealSky at a fixed commit. Editable install, because RealSky locates its
 # configs and network checkpoints relative to its own source tree.
-ARG REALSKY_COMMIT=429bebe0e0280973f50d4315d18651ebde53d16f
+# 321cb0b (2026-11-10) has the pixel_scale**2 brightness fix (77ffeb2) and
+# per-simulation seeds (c1144f7, 7e3e41d). Don't pin anything from 77ffeb2 up to,
+# but not including, 321cb0b: in those commits Roman F087 was rendered from F062.
+ARG REALSKY_COMMIT=321cb0b8271753b152e7a2247ba4f683e17da874
 RUN git clone --quiet https://github.com/lparis3/deeplens_update.git /opt/realsky \
     && git -C /opt/realsky checkout --quiet --detach "$REALSKY_COMMIT" \
     && test "$(git -C /opt/realsky rev-parse HEAD)" = "$REALSKY_COMMIT" \

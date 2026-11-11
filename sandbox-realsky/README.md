@@ -8,7 +8,7 @@ Nothing in the agent uses this image yet.
 
 **RealSky has no license**, so none of its code is in this repository. The
 Dockerfile clones it at build time, pinned to commit
-`429bebe0e0280973f50d4315d18651ebde53d16f`. For the same reason, build the
+`321cb0b8271753b152e7a2247ba4f683e17da874` (2026-11-10). For the same reason, build the
 image locally and don't publish it: it contains RealSky's code.
 
 ## Build
@@ -77,8 +77,15 @@ which uses real-image INTERPOL sources, and for Roman_VIS (Model A, which forces
 Sersic sources). It runs one container at a time and checks every output image with
 `inspect_outputs.py`. Set `INSTRUMENTS`, `TIMEOUT` or `WORK` to change it.
 
-Result on 2026-10-26 (Colima, aarch64), run twice: all 8 simulations completed with
-no retries, in about 90 s in total. Every lensed, no-substructure and unlensed image
+Result on 2026-11-11 with RealSky `321cb0b` (Colima, aarch64): all 8 simulations
+completed with no retries, in about 95 s in total, and every image passed the same
+checks as below. LSST and Roman_VIS now drew different lens systems, and each output
+records its seed. Peak counts were roughly 100× higher for Roman_VIS and 20× for LSST
+than in the October runs, in line with the removed `pixel_scale²` (83× and 25×). The
+lens systems differ between runs, so this is a sanity check, not a measurement.
+
+Result on 2026-10-26 with RealSky `429bebe` (Colima, aarch64), run twice: all 8
+simulations completed with no retries, in about 90 s in total. Every lensed, no-substructure and unlensed image
 was present, 127×127, finite and non-zero, and every convergence map was finite. The
 slowest run was SIDM with ~35,000 subhalos (52 s). Nothing exceeded the 2 GB memory
 cap, and no run tried to reach the network. The only warning is an
@@ -86,16 +93,29 @@ cap, and no run tried to reach the network. The only warning is an
 
 ## RealSky behaviour to be aware of
 
-These come from an audit of commit `429bebe` and are RealSky's own choices, not this
-image's:
+These come from an audit of commit `429bebe`, rechecked against `321cb0b`, and are
+RealSky's own choices, not this image's:
 
 - Roman_VIS always uses Sersic sources, so Model A's sources are not real galaxy images.
-- Noise is Poisson only: it calls `noise_for_model(..., background_noise=False)`.
-- Images are scaled by an extra `pixel_scale²`, which makes them 14–98× fainter than
-  their catalog magnitudes. Exposure counts are scaled up to compensate for SNR.
 - Euclid VIS adds the r and i renders, which doubles the flux.
-- Random seeds come from process IDs, so runs are not reproducible.
-- Within one run, every instrument gets the same sampled lens system: the smoke
-  test's LSST and Roman_VIS simulations had identical redshifts, θ_E and masses.
-  The likely cause is that each instrument's worker is forked from the same parent
-  and inherits its torch random state. Separate runs draw different systems.
+- Euclid and Roman_VIS multiply `num_exposures` by 30 (`EXPOSURE_SCALING` in
+  `observations/observation_builder.py`), which raises their S/N by about √30 ≈ 5.5×
+  over the survey defaults. The factor was tuned for S/N in June 2026, while images
+  were still too faint (see below), and is unchanged at `321cb0b`.
+- Each simulation seeds numpy and torch from a base seed, its dark-matter type,
+  instrument and index, and saves that seed in its `seed` metadata. The base seed is
+  drawn fresh every run (`secrets.randbits`) and can't be set from the config, so a
+  run can't be repeated without changing RealSky's code.
+
+Fixed upstream since the audit:
+
+- Images were scaled by an extra `pixel_scale²`, which made them 14–98× fainter than
+  their catalog magnitudes. Removed in 77ffeb2 (2026-10-29). That commit also rendered
+  Roman F087 from the F062 image, which df17dc5 and 321cb0b fixed, so don't pin a
+  commit from 77ffeb2 up to, but not including, `321cb0b`.
+- Noise was Poisson only (`background_noise=False`); background noise is on since
+  8d3b493 (2026-10-27).
+- Seeds came from process IDs, and within one run every instrument got the same
+  sampled lens system, because the forked workers inherited the parent's torch random
+  state. The per-simulation seeds (c1144f7, 7e3e41d) fixed both: in the 2026-11-11
+  smoke test, LSST and Roman_VIS drew different systems.
